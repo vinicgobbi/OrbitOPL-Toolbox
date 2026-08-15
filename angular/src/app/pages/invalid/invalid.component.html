@@ -144,52 +144,8 @@
     <p class="py-4 text-sm text-base-content/70">
       Auto-discovers the game ID for every invalid file by reading the disc
       image itself — ISO is scanned directly, ZSO is decompressed on the fly —
-      then renames each file into the convention you choose below.
+      then renames each file using the naming convention set in Settings.
     </p>
-
-    <div>
-      <span class="text-sm font-semibold">Target convention</span>
-      <div class="mt-2 flex flex-col gap-2">
-        <label
-          class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
-        >
-          <input
-            type="radio"
-            name="bulk_convention"
-            class="radio radio-primary radio-sm mt-0.5"
-            [checked]="bulkConvention === 'new'"
-            [disabled]="bulkRunning"
-            (change)="bulkConvention = 'new'"
-          />
-          <span class="leading-tight">
-            <span class="text-sm">New — &lt;Title&gt;.iso</span>
-            <span class="block text-[0.68rem] text-base-content/55">
-              e.g. <span class="font-mono">Max Payne.iso</span>. OPL reads the
-              game ID from the disc.
-            </span>
-          </span>
-        </label>
-        <label
-          class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
-        >
-          <input
-            type="radio"
-            name="bulk_convention"
-            class="radio radio-primary radio-sm mt-0.5"
-            [checked]="bulkConvention === 'old'"
-            [disabled]="bulkRunning"
-            (change)="bulkConvention = 'old'"
-          />
-          <span class="leading-tight">
-            <span class="text-sm">Old — &lt;GAMEID&gt;.&lt;Title&gt;.iso</span>
-            <span class="block text-[0.68rem] text-base-content/55">
-              e.g. <span class="font-mono">SLES_123.45.Max Payne.iso</span>.
-              Maximally compatible with older OPL builds.
-            </span>
-          </span>
-        </label>
-      </div>
-    </div>
 
     <label class="mt-3 flex cursor-pointer items-center gap-3">
       <input

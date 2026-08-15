@@ -11,6 +11,7 @@ import {
 } from './components/artwork-bulk-dialog/artwork-bulk-dialog.component';
 import { LibraryService } from '../../shared/services/library.service';
 import { JobsService } from '../../shared/services/jobs.service';
+import { SettingsService } from '../../shared/services/settings.service';
 import { AsyncPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { Game } from '../../shared/types/game.type';
@@ -40,6 +41,7 @@ export class LibraryComponent {
     public readonly _libraryService: LibraryService,
     private readonly _jobs: JobsService,
     private readonly _router: Router,
+    public readonly _settings: SettingsService,
   ) { }
 
   private gameSystemToTab(system: string | undefined): SystemTab {
@@ -70,7 +72,8 @@ export class LibraryComponent {
   }
 
   /** Queues an artwork-download job for each bulk-wizard target with the chosen types. */
-  onArtworkBulkConfirm({ artTypes, skipExisting }: ArtworkBulkConfirmEvent) {
+  onArtworkBulkConfirm({ skipExisting }: ArtworkBulkConfirmEvent) {
+    const artTypes = this._settings.current.defaultArtTypes;
     this._jobs.enqueue(
       this.artworkBulkTargets.map((g) => ({
         type: 'artwork',
@@ -136,6 +139,7 @@ export class LibraryComponent {
   public totalCount$: Observable<number> | undefined;
 
   ngOnInit() {
+    this._settings.load();
     const library$ = this._libraryService.library$;
 
     this.activeTabSubject.next(this._libraryService.returnTab);

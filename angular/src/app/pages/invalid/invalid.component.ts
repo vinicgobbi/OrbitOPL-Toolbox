@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { LibraryService } from '../../shared/services/library.service';
 import {
   JobsService,
   NewImportJob,
 } from '../../shared/services/jobs.service';
+import { SettingsService } from '../../shared/services/settings.service';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -15,20 +16,24 @@ import { LucideAngularModule } from 'lucide-angular';
   templateUrl: './invalid.component.html',
   styleUrl: './invalid.component.scss',
 })
-export class InvalidComponent {
+export class InvalidComponent implements OnInit {
   renamedFilePath: string = '';
   renameGameId: string = '';
   renameGameName: string = '';
   fetchArtwork: boolean = false;
 
-  bulkConvention: 'old' | 'new' = 'new';
   bulkRunning: boolean = false;
   bulkResult: { corrected: number; skipped: number } | null = null;
 
   constructor(
     public readonly _libraryService: LibraryService,
-    private readonly _jobs: JobsService
+    private readonly _jobs: JobsService,
+    private readonly _settings: SettingsService
   ) {}
+
+  ngOnInit() {
+    this._settings.load();
+  }
 
   openRenameTool(filepath: string) {
     const dialog = document.getElementById('rename_tool') as HTMLDialogElement;
@@ -67,6 +72,8 @@ export class InvalidComponent {
       .planBulkAutoCorrection()
       .then(({ resolved, skipped }) => {
         const jobs: NewImportJob[] = [];
+        const keepOriginalName =
+          this._settings.current.namingConvention === 'new';
         for (const item of resolved) {
           jobs.push({
             type: 'rename',
@@ -75,7 +82,7 @@ export class InvalidComponent {
             gameId: item.gameId,
             gameName: item.gameName,
             downloadArtwork: false,
-            keepOriginalName: this.bulkConvention === 'new',
+            keepOriginalName,
           });
           if (this.fetchArtwork) {
             jobs.push({
@@ -86,6 +93,7 @@ export class InvalidComponent {
               gameName: item.gameName,
               downloadArtwork: false,
               system: 'PS2',
+              artTypes: this._settings.current.defaultArtTypes,
             });
           }
         }
@@ -106,8 +114,7 @@ export class InvalidComponent {
         gameId: this.renameGameId,
         gameName: this.renameGameName,
         downloadArtwork: false,
-        // Invalid-file fixups use the old convention (keep the GAMEID. prefix).
-        keepOriginalName: false,
+        keepOriginalName: this._settings.current.namingConvention === 'new',
       },
     ];
     if (this.fetchArtwork) {
@@ -119,6 +126,7 @@ export class InvalidComponent {
         gameName: this.renameGameName,
         downloadArtwork: false,
         system: 'PS2',
+        artTypes: this._settings.current.defaultArtTypes,
       });
     }
     this._jobs.enqueue(jobs);

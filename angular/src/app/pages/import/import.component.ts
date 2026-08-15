@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { LibraryService } from '../../shared/services/library.service';
 import { JobsService, ImportJobType } from '../../shared/services/jobs.service';
+import { SettingsService } from '../../shared/services/settings.service';
 import { AsyncPipe } from '@angular/common';
 
 interface StagedFile {
@@ -20,16 +21,15 @@ interface StagedFile {
   templateUrl: './import.component.html',
   styleUrl: './import.component.scss',
 })
-export class ImportComponent {
+export class ImportComponent implements OnInit {
   constructor(
     public _libraryService: LibraryService,
-    private _jobs: JobsService
+    private _jobs: JobsService,
+    private _settings: SettingsService
   ) {}
 
   importMode: ImportJobType = 'ps2-dvd';
   downloadArtwork = true;
-  /** PS2 DVD only: keep the original filename (new OPL convention). */
-  keepOriginalName = false;
   elfPrefix = 'XX.';
 
   staged: StagedFile[] = [];
@@ -56,6 +56,10 @@ export class ImportComponent {
     return this.staged.filter(
       (f) => f.gameName && (this.isApp || f.gameId)
     ).length;
+  }
+
+  ngOnInit() {
+    this._settings.load();
   }
 
   setMode(mode: ImportJobType) {
@@ -154,7 +158,9 @@ export class ImportComponent {
         gameName: f.gameName,
         downloadArtwork: this.downloadArtwork,
         elfPrefix: this.isGamePsx ? this.elfPrefix : undefined,
-        keepOriginalName: this.isGameDvd ? this.keepOriginalName : undefined,
+        keepOriginalName: this.isGameDvd
+          ? this._settings.current.namingConvention === 'new'
+          : undefined,
       }))
     );
     this.staged = [];

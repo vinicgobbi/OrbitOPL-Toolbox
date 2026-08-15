@@ -14,11 +14,17 @@ export interface AppSettings {
   lastDirectory?: string;
   /** Re-mount the last directory automatically on launch. */
   autoReconnect: boolean;
+  /** Naming convention applied when importing/correcting PS2 DVD games. 'new' drops the GAMEID prefix. */
+  namingConvention: "old" | "new";
+  /** Art types downloaded by default in bulk artwork operations. */
+  defaultArtTypes: string[];
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   lastDirectory: undefined,
   autoReconnect: true,
+  namingConvention: "new",
+  defaultArtTypes: ["COV", "ICO", "SCR"],
 };
 
 function settingsFilePath(): string {

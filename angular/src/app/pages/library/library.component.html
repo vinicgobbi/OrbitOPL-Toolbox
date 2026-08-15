@@ -205,6 +205,7 @@
 @if (showArtworkBulkDialog) {
   <app-artwork-bulk-dialog
     [gameCount]="artworkBulkTargets.length"
+    [defaultArtTypes]="_settings.current.defaultArtTypes"
     (confirm)="onArtworkBulkConfirm($event)"
     (closed)="showArtworkBulkDialog = false"
   ></app-artwork-bulk-dialog>

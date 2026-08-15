@@ -13,6 +13,8 @@ import { LogsService } from './logs.service';
 export class SettingsService {
   private settingsSubject = new BehaviorSubject<AppSettings>({
     autoReconnect: true,
+    namingConvention: 'new',
+    defaultArtTypes: ['COV', 'ICO', 'SCR'],
   });
   public get settings$(): Observable<AppSettings> {
     return this.settingsSubject.asObservable();

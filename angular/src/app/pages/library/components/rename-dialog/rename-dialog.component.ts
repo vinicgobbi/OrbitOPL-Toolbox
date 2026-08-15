@@ -12,6 +12,7 @@ import {
 import { LucideAngularModule } from 'lucide-angular';
 import { LibraryService } from '@shared/services/library.service';
 import { JobsService } from '@shared/services/jobs.service';
+import { SettingsService } from '@shared/services/settings.service';
 import { Game } from '@shared/types/game.type';
 
 type Convention = 'old' | 'new';
@@ -78,6 +79,7 @@ export class LibraryRenameDialogComponent implements OnInit {
   constructor(
     private readonly _libraryService: LibraryService,
     private readonly _jobs: JobsService,
+    private readonly _settings: SettingsService,
   ) {}
 
   private isEligible(g: Game): boolean {
@@ -129,6 +131,7 @@ export class LibraryRenameDialogComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.convention = this._settings.current.namingConvention;
     const g = this.game();
     const pool = g ? [g] : this._libraryService.currentLibraryValue;
     this.candidates = pool.filter((g) => this.isEligible(g));

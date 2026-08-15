@@ -428,5 +428,9 @@ declare interface AppSettings {
   lastDirectory?: string;
   /** Whether to auto-reconnect to the last directory on startup. */
   autoReconnect: boolean;
+  /** Naming convention applied when importing/correcting PS2 DVD games. 'new' drops the GAMEID prefix. */
+  namingConvention: "old" | "new";
+  /** Art types downloaded by default in bulk artwork operations. */
+  defaultArtTypes: string[];
 }
 

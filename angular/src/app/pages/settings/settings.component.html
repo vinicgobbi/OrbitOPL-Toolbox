@@ -47,6 +47,89 @@
         </div>
       </div>
 
+      <!-- ── Naming ──────────────────────────────────────────────── -->
+      <div class="glass rounded-box">
+        <div class="card-body">
+          <h2 class="card-title text-base">
+            <i-lucide name="file-cog" size="20" class="text-accent"></i-lucide>
+            Naming
+          </h2>
+          <p class="text-sm text-base-content/60">
+            Convention used when importing PS2 DVD games and correcting
+            invalid game files.
+          </p>
+
+          <div class="mt-2 flex flex-col gap-2">
+            <label
+              class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
+            >
+              <input
+                type="radio"
+                name="naming_convention"
+                class="radio radio-primary radio-sm mt-0.5"
+                [checked]="(settings$ | async)?.namingConvention === 'new'"
+                (change)="onNamingConventionChange('new')"
+              />
+              <span class="leading-tight">
+                <span class="text-sm">New — &lt;Title&gt;.iso</span>
+                <span class="block text-[0.68rem] text-base-content/55">
+                  e.g. <span class="font-mono">Max Payne.iso</span>. OPL reads
+                  the game ID from the disc.
+                </span>
+              </span>
+            </label>
+            <label
+              class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
+            >
+              <input
+                type="radio"
+                name="naming_convention"
+                class="radio radio-primary radio-sm mt-0.5"
+                [checked]="(settings$ | async)?.namingConvention === 'old'"
+                (change)="onNamingConventionChange('old')"
+              />
+              <span class="leading-tight">
+                <span class="text-sm">Old — &lt;GAMEID&gt;.&lt;Title&gt;.iso</span>
+                <span class="block text-[0.68rem] text-base-content/55">
+                  e.g. <span class="font-mono">SLES_123.45.Max Payne.iso</span>.
+                  Maximally compatible with older OPL builds.
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Artwork ─────────────────────────────────────────────── -->
+      <div class="glass rounded-box">
+        <div class="card-body">
+          <h2 class="card-title text-base">
+            <i-lucide name="image-down" size="20" class="text-accent"></i-lucide>
+            Artwork
+          </h2>
+          <p class="text-sm text-base-content/60">
+            Art types downloaded by default when fetching covers in bulk.
+          </p>
+
+          <div class="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+            @for (type of knownArtTypes; track type) {
+              <label
+                class="flex cursor-pointer items-center gap-2 rounded-md p-2 hover:bg-base-100/40"
+              >
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm checkbox-primary"
+                  [checked]="isArtTypeSelected(type)"
+                  (change)="toggleDefaultArtType(type)"
+                />
+                <span class="text-sm">{{ artTypeLabel(type) }}</span>
+                <span class="font-mono text-[0.65rem] text-base-content/40">{{ type }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
       <!-- ── Updates ─────────────────────────────────────────────── -->
       <div class="glass rounded-box">
         <div class="card-body">

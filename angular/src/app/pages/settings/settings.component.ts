@@ -5,6 +5,10 @@ import { Observable } from 'rxjs';
 import { SettingsService } from '../../shared/services/settings.service';
 import { LogsService } from '../../shared/services/logs.service';
 import { UpdateService } from '../../shared/services/update.service';
+import {
+  KNOWN_ART_TYPES,
+  artTypeLabel,
+} from '@shared/constants/artwork-presets';
 
 @Component({
   selector: 'app-settings',
@@ -15,6 +19,9 @@ import { UpdateService } from '../../shared/services/update.service';
 export class SettingsComponent implements OnInit {
   public settings$: Observable<AppSettings>;
   public verboseMode = false;
+
+  readonly knownArtTypes = KNOWN_ART_TYPES;
+  readonly artTypeLabel = artTypeLabel;
 
   constructor(
     private readonly _settings: SettingsService,
@@ -44,5 +51,21 @@ export class SettingsComponent implements OnInit {
   onVerboseChange(): void {
     this._logger.toggleVerboseMode();
     this.verboseMode = this._logger.isVerboseMode;
+  }
+
+  onNamingConventionChange(value: 'old' | 'new'): void {
+    this._settings.set('namingConvention', value);
+  }
+
+  isArtTypeSelected(type: string): boolean {
+    return this._settings.current.defaultArtTypes.includes(type);
+  }
+
+  toggleDefaultArtType(type: string): void {
+    const current = this._settings.current.defaultArtTypes;
+    const next = current.includes(type)
+      ? current.filter((t) => t !== type)
+      : [...current, type];
+    this._settings.set('defaultArtTypes', next);
   }
 }
