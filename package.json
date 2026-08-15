@@ -1,6 +1,6 @@
 {
   "name": "orbitopl-toolbox",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A modern, cross-platform way to manage your OPL game collection. ",
   "author": "Luden",
   "license": "GPL-3.0-only",
@@ -10,18 +10,14 @@
     "setup": "node scripts/setup.js",
     "postinstall": "electron-builder install-app-deps",
     "commit": "cz commit",
-
     "electron": "electron",
     "start": "npm run build:info && npm run build && electron ./dist/src/main.js",
-
     "build": "tsc",
     "build:watch": "tsc -w",
     "build:info": "node scripts/generate-build-info.js",
-
     "angular:serve": "cd angular && npx ng serve",
     "electron:serve": "electron ./dist/src/main.js --serve",
     "app:serve": "npm run build:info && concurrently \"npm run angular:serve\" \"npm run build:watch\" \"wait-on http://localhost:4200 && npm run electron:serve\"",
-
     "remove": "rimraf -rf ./dist && rimraf -rf ./build",
     "package:prep": "npm run remove && npm run build:info && cd angular && npm run build --omit=dev && cd .. && npm run build",
     "package:win": "npm run package:prep && electron-builder --win",
