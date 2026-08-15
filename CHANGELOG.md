@@ -1,3 +1,9 @@
+## v1.5.0-a0+502040e (2026-08-15)
+
+### Feat
+
+- update pnpm workspace and IPC dialog handling
+
 ## v1.4.0 (2026-08-15)
 
 ### Feat
