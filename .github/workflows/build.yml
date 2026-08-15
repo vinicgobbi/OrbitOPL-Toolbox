@@ -2,10 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main]
-    tags: ["v*"]
+    branches: [main, development]
   pull_request:
-    branches: [main]
+    branches: [main, development]
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +15,58 @@ env:
   NODE_VERSION: "22"
 
 jobs:
+  # Bumps the version with commitizen based on conventional commits since the
+  # last tag. `development` gets an alpha prerelease tagged with the short
+  # SHA (e.g. v1.4.0-a0+f64fac5); `main` gets a stable release. No-ops (and
+  # every job below is skipped) when nothing on the branch warrants a bump.
+  bump:
+    name: Bump version
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development') &&
+      !startsWith(github.event.head_commit.message, 'bump:')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.cz.outputs.version }}
+      tag: v${{ steps.cz.outputs.version }}
+      is_prerelease: ${{ github.ref == 'refs/heads/development' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Short SHA
+        id: sha
+        run: echo "short=$(echo "$GITHUB_SHA" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - name: Bump with commitizen
+        id: cz
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          changelog_increment_filename: body.md
+          changelog: ${{ github.ref == 'refs/heads/main' }}
+          prerelease: ${{ github.ref == 'refs/heads/development' && 'alpha' || '' }}
+          build_metadata: ${{ github.ref == 'refs/heads/development' && steps.sha.outputs.short || '' }}
+
+      - name: Upload release notes
+        if: steps.cz.outputs.version != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: body.md
+          if-no-files-found: ignore
+
   build:
+    needs: [bump]
+    if: >
+      always() && !failure() && !cancelled() &&
+      (needs.bump.result == 'skipped' ||
+        (needs.bump.result == 'success' && needs.bump.outputs.version != ''))
     strategy:
       fail-fast: false
       matrix:
@@ -36,6 +86,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump.outputs.version != '' && needs.bump.outputs.tag || github.sha }}
 
       - name: Install rpm (Linux packaging dependency)
         if: matrix.os == 'ubuntu-latest'
@@ -83,19 +135,31 @@ jobs:
 
   release:
     name: Publish release
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [bump, build]
+    if: needs.bump.result == 'success' && needs.bump.outputs.version != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download artifacts
+      - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist-artifacts
+          pattern: "*-build"
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: notes
+        continue-on-error: true
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
+          tag_name: ${{ needs.bump.outputs.tag }}
+          name: ${{ needs.bump.outputs.tag }}
+          prerelease: ${{ needs.bump.outputs.is_prerelease }}
+          draft: ${{ needs.bump.outputs.is_prerelease != 'true' }}
+          body_path: notes/body.md
           files: dist-artifacts/**/*

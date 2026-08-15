@@ -9,6 +9,7 @@
   "scripts": {
     "setup": "node scripts/setup.js",
     "postinstall": "electron-builder install-app-deps",
+    "commit": "cz commit",
 
     "electron": "electron",
     "start": "npm run build:info && npm run build && electron ./dist/src/main.js",
