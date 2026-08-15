@@ -257,7 +257,7 @@ export async function convertToVcd(
         start: 0,
         end: gapInsertOffset - 1,
       });
-      part1.on("data", (chunk: Buffer) => {
+      part1.on("data", (chunk) => {
         writtenBytes += chunk.length;
         if (onProgress) {
           onProgress(
@@ -285,7 +285,7 @@ export async function convertToVcd(
       const part2 = fsSync.createReadStream(binPath, {
         start: gapInsertOffset,
       });
-      part2.on("data", (chunk: Buffer) => {
+      part2.on("data", (chunk) => {
         writtenBytes += chunk.length;
         if (onProgress) {
           onProgress(
@@ -302,7 +302,7 @@ export async function convertToVcd(
     // Standard: just stream the whole BIN
     await new Promise<void>((resolve, reject) => {
       const readStream = fsSync.createReadStream(binPath);
-      readStream.on("data", (chunk: Buffer) => {
+      readStream.on("data", (chunk) => {
         writtenBytes += chunk.length;
         if (onProgress) {
           onProgress(

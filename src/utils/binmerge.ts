@@ -77,7 +77,7 @@ export async function mergeMultiBin(
 
     await new Promise<void>((resolve, reject) => {
       const readStream = fsSync.createReadStream(binPath);
-      readStream.on("data", (chunk: Buffer) => {
+      readStream.on("data", (chunk) => {
         writtenBytes += chunk.length;
         if (onProgress && totalSize > 0) {
           onProgress(
