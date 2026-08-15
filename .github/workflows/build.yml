@@ -160,6 +160,5 @@ jobs:
           tag_name: ${{ needs.bump.outputs.tag }}
           name: ${{ needs.bump.outputs.tag }}
           prerelease: ${{ needs.bump.outputs.is_prerelease }}
-          draft: ${{ needs.bump.outputs.is_prerelease != 'true' }}
           body_path: notes/body.md
           files: dist-artifacts/**/*
