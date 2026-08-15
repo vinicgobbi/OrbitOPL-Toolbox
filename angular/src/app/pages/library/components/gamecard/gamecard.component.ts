@@ -89,10 +89,7 @@ export class GamecardComponent {
   });
 
   /** Whether this game is a PS1 launcher app. */
-  readonly isPs1LauncherApp = computed(() => {
-    const g = this.game();
-    return g?.system === 'APPS' && !!g?.isPs1Launcher;
-  });
+  readonly isPs1LauncherApp = computed(() => !!this.game()?.isPs1Launcher);
 
   /** Format label shown in the chip — "ELF" for regular apps, otherwise format/extension. */
   readonly formatLabel = computed(() => {

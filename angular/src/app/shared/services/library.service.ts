@@ -554,14 +554,14 @@ export class LibraryService {
     const gameEntry: Game = {
       filename: file.name + file.extension,
       title,
-      cdType: hasLauncher ? 'APPS' : isPops ? 'POPS' : dirName,
+      cdType: isPops ? 'POPS' : dirName,
       gameId,
       region: this.mapGameIdToRegion(gameId),
       path: file.path,
       extension: file.extension,
       parentPath: file.parentPath,
       format: isPops ? 'POPS' : this.extensionToFormat(file.extension),
-      system: hasLauncher ? 'APPS' : isPops || isVcd ? 'PS1' : 'PS2',
+      system: isPops || isVcd ? 'PS1' : 'PS2',
       size: this.formatFileSize(file.stats!.size) || '??',
     };
 

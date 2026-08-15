@@ -104,8 +104,8 @@
       <!-- top overlays -->
       <span
         class="poster-system"
-        [class.is-ps1]="game()?.system === 'PS1'"
-        [class.is-ps1-app]="game()?.system === 'APPS'"
+        [class.is-ps1]="game()?.system === 'PS1' && !game()?.isPs1Launcher"
+        [class.is-ps1-app]="game()?.isPs1Launcher || game()?.system === 'APPS'"
         >{{ displaySystemLabel() }}</span
       >
 

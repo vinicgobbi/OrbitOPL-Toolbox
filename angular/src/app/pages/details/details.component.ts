@@ -126,7 +126,7 @@ export class DetailsComponent {
    */
   private _loadMetadata(root: string): void {
     const game = this.game!;
-    const isPs1LauncherApp = game.system === 'APPS' && !!game.isPs1Launcher;
+    const isPs1LauncherApp = !!game.isPs1Launcher;
     const isElfApp = game.system === 'APPS' && !game.isPs1Launcher;
     const isDiscGame = !isPs1LauncherApp && !isElfApp && !!game.gameId;
 
@@ -238,6 +238,12 @@ export class DetailsComponent {
   get isSquareCover(): boolean {
     if (!this.game) return false;
     return this.game.system === 'PS1' || this.game.system === 'APPS';
+  }
+
+  /** System chip label — flags PS1 POPStarter launchers explicitly. */
+  get systemLabel(): string {
+    if (this.game?.isPs1Launcher) return 'PS1 App';
+    return this.game?.system || 'PS2';
   }
 
   /** `true` when the current game is an ELF homebrew app (not POPStarter). */
