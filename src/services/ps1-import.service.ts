@@ -8,12 +8,12 @@ import { downloadArtByGameId } from "./artwork.service";
 import { sanitizeGameFilename } from "../utils/sanitize";
 import { describeFileAccessError } from "../utils/file-access-error";
 import { createLogger } from "../logger";
+import { resolveAssetPath } from "../utils/assets-path";
 
 const log = createLogger("ps1-import");
 
 const POPSTARTER_ELF_CANDIDATE_PATHS = [
-  path.resolve(__dirname, "../assets/POPSTARTER.ELF"),
-  path.resolve(__dirname, "../../assets/POPSTARTER.ELF"),
+  resolveAssetPath("POPSTARTER.ELF"),
   path.resolve(process.cwd(), "assets/POPSTARTER.ELF"),
 ];
 

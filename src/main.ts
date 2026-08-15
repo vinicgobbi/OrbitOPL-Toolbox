@@ -11,6 +11,7 @@ import electronReloader from "electron-reloader";
 import PackageInfo from "../package.json";
 import { createLogger, setLogWindow } from "./logger";
 import { registerAllIpc } from "./ipc";
+import { resolveAssetPath } from "./utils/assets-path";
 
 const log = createLogger("main");
 
@@ -30,7 +31,7 @@ function createWindow() {
     minWidth: size.minWidth,
     minHeight: size.minHeight,
     title: `OrbitOPL Toolbox (${PackageInfo.version})`,
-    icon: path.join(__dirname, "assets", "applogo", "icon_512x512.png"),
+    icon: resolveAssetPath("applogo", "icon_512x512.png"),
     frame: isMac,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
