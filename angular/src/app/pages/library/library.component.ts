@@ -80,6 +80,7 @@ export class LibraryComponent {
         gameName: g.title || '',
         downloadArtwork: false,
         system: g.system === 'PS1' ? 'PS1' : 'PS2',
+        saveAsName: g.isPs1Launcher ? g.ps1LauncherBoot : undefined,
         skipExisting,
         artTypes,
       }))
