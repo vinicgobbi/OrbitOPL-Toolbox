@@ -6,7 +6,7 @@ import {
 } from "../services/library.service";
 
 export function registerDialogIpc(): void {
-  ipcMain.handle("open-ask-directory", async (options) => {
+  ipcMain.handle("open-ask-directory", async (_event, options) => {
     return openAskDirectory(options);
   });
 

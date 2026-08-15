@@ -3,7 +3,8 @@ import { contextBridge, ipcRenderer } from "electron";
 function buildLibraryAPI() {
   return {
     // ── Directory & structure ───────────────────────
-    openAskDirectory: () => ipcRenderer.invoke("open-ask-directory"),
+    openAskDirectory: (options?: { defaultPath?: string }) =>
+      ipcRenderer.invoke("open-ask-directory", options),
     checkOplStructure: (dirPath: string) =>
       ipcRenderer.invoke("check-opl-structure", dirPath),
     createOplFolders: (dirPath: string, folders: string[]) =>

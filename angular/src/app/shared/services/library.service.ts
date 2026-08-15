@@ -166,7 +166,8 @@ export class LibraryService {
     );
     this.setLoading(true);
     this.setCurrentAction('User choosing directory...');
-    return window.libraryAPI.openAskDirectory().then(async (data: any) => {
+    const defaultPath = this._settings.current.lastDirectory;
+    return window.libraryAPI.openAskDirectory(defaultPath ? { defaultPath } : undefined).then(async (data: any) => {
       if (!data.canceled) {
         const chosen = data.filePaths[0];
         this._logger.log(

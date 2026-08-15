@@ -2,7 +2,7 @@
 declare interface Window {
   libraryAPI: {
     /** Open native directory picker. */
-    openAskDirectory: () => Promise<any>;
+    openAskDirectory: (options?: { defaultPath?: string }) => Promise<any>;
 
     /** List game files in a directory. */
     getGamesFiles: (dirPath: string) => Promise<any>;
