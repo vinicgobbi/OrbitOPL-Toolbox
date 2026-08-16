@@ -7,6 +7,8 @@ function buildLibraryAPI() {
       ipcRenderer.invoke("open-ask-directory", options),
     checkOplStructure: (dirPath: string) =>
       ipcRenderer.invoke("check-opl-structure", dirPath),
+    resolveDiscFolder: (filePath: string) =>
+      ipcRenderer.invoke("resolve-disc-folder", filePath),
     createOplFolders: (dirPath: string, folders: string[]) =>
       ipcRenderer.invoke("create-opl-folders", dirPath, folders),
     directoryExists: (dirPath: string) =>

@@ -31,6 +31,9 @@ export class JobsPanelComponent {
   }
 
   typeLabel(job: ImportJob): string {
+    if (job.type === 'ps2-dvd' && job.discFolder === 'CD') {
+      return 'PS2 CD';
+    }
     switch (job.type) {
       case 'ps2-cd':
         return 'PS2 CD';

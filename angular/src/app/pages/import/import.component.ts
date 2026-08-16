@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { LibraryService } from '../../shared/services/library.service';
-import { JobsService, ImportJobType } from '../../shared/services/jobs.service';
+import { JobsService } from '../../shared/services/jobs.service';
 import { SettingsService } from '../../shared/services/settings.service';
 import { AsyncPipe } from '@angular/common';
+
+type DiscMode = 'ps2' | 'ps1' | 'apps';
 
 interface StagedFile {
   path: string;
@@ -13,6 +15,10 @@ interface StagedFile {
   detected: boolean;
   invalid: boolean;
   message?: string;
+  /** PS2 only: which import pipeline this file resolved to. */
+  resolvedType?: 'ps2-cd' | 'ps2-dvd';
+  /** PS2 only, resolvedType === 'ps2-dvd': destination folder, by size. */
+  discFolder?: 'CD' | 'DVD';
 }
 
 @Component({
@@ -28,18 +34,15 @@ export class ImportComponent implements OnInit {
     private _settings: SettingsService
   ) {}
 
-  importMode: ImportJobType = 'ps2-dvd';
+  importMode: DiscMode = 'ps2';
   downloadArtwork = true;
   elfPrefix = 'XX.';
 
   staged: StagedFile[] = [];
   scanning = false;
 
-  get isGameCd(): boolean {
-    return this.importMode === 'ps2-cd';
-  }
-  get isGameDvd(): boolean {
-    return this.importMode === 'ps2-dvd';
+  get isPs2(): boolean {
+    return this.importMode === 'ps2';
   }
   get isGamePsx(): boolean {
     return this.importMode === 'ps1';
@@ -62,7 +65,7 @@ export class ImportComponent implements OnInit {
     this._settings.load();
   }
 
-  setMode(mode: ImportJobType) {
+  setMode(mode: DiscMode) {
     this.importMode = mode;
     this.staged = [];
   }
@@ -71,8 +74,8 @@ export class ImportComponent implements OnInit {
     const result = this.isApp
       ? await window.libraryAPI.openAskElfFiles()
       : await window.libraryAPI.openAskGameFiles(
-          this.isGameCd || this.isGamePsx,
-          this.isGameDvd
+          this.isPs2 || this.isGamePsx,
+          this.isPs2
         );
     if (result?.canceled || !result?.filePaths?.length) {
       return;
@@ -100,28 +103,40 @@ export class ImportComponent implements OnInit {
     return { path, fileName, gameId: '', gameName: title, detected: false, invalid: false };
   }
 
+  /** PS2 only: resolves which pipeline a staged file uses and, for an
+   *  already-cooked .iso/.zso, which folder it lands in based on size. */
+  private async resolveDiscRouting(
+    path: string
+  ): Promise<Pick<StagedFile, 'resolvedType' | 'discFolder'>> {
+    if (!this.isPs2) return {};
+    if (/\.cue$/i.test(path)) {
+      return { resolvedType: 'ps2-cd', discFolder: 'CD' };
+    }
+    const res = await window.libraryAPI.resolveDiscFolder(path);
+    return { resolvedType: 'ps2-dvd', discFolder: res?.folder || 'DVD' };
+  }
+
   private async detectFile(path: string): Promise<StagedFile> {
     const fileName = path.split(/[\\/]/).pop() || path;
     const detect = this.isGamePsx
       ? this._libraryService.tryDeterminePs1GameIdFromHex(path)
       : this._libraryService.tryDetermineGameIdFromHex(path);
 
-    let message: string | undefined;
-    try {
-      const res: any = await detect;
-      if (res?.success) {
-        return {
-          path,
-          fileName,
-          gameId: res.gameId || '',
-          gameName: res.gameName || '',
-          detected: true,
-          invalid: false,
-        };
-      }
-      message = res?.message;
-    } catch (err: any) {
-      message = err?.message;
+    const [res, routing] = await Promise.all([
+      detect.catch((err: any) => ({ success: false, message: err?.message })),
+      this.resolveDiscRouting(path),
+    ]);
+
+    if ((res as any)?.success) {
+      return {
+        path,
+        fileName,
+        gameId: (res as any).gameId || '',
+        gameName: (res as any).gameName || '',
+        detected: true,
+        invalid: false,
+        ...routing,
+      };
     }
     return {
       path,
@@ -130,7 +145,8 @@ export class ImportComponent implements OnInit {
       gameName: '',
       detected: false,
       invalid: true,
-      message,
+      message: (res as any)?.message,
+      ...routing,
     };
   }
 
@@ -151,16 +167,22 @@ export class ImportComponent implements OnInit {
     }
     this._jobs.enqueue(
       ready.map((f) => ({
-        type: this.importMode,
+        type: this.isApp
+          ? 'apps'
+          : this.isGamePsx
+          ? 'ps1'
+          : f.resolvedType ?? 'ps2-dvd',
         label: f.gameName || f.gameId || f.fileName,
         filePath: f.path,
         gameId: f.gameId,
         gameName: f.gameName,
         downloadArtwork: this.downloadArtwork,
         elfPrefix: this.isGamePsx ? this.elfPrefix : undefined,
-        keepOriginalName: this.isGameDvd
-          ? this._settings.current.namingConvention === 'new'
-          : undefined,
+        discFolder: f.resolvedType === 'ps2-dvd' ? f.discFolder : undefined,
+        keepOriginalName:
+          f.resolvedType === 'ps2-dvd'
+            ? this._settings.current.namingConvention === 'new'
+            : undefined,
       }))
     );
     this.staged = [];

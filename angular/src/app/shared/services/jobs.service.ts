@@ -45,6 +45,12 @@ export interface ImportJob {
    */
   keepOriginalName?: boolean;
   /**
+   * PS2 DVD-type jobs only: destination subfolder for an already-cooked
+   * disc image, resolved by file size. Defaults to 'DVD' when unset (e.g.
+   * jobs created before this field existed).
+   */
+  discFolder?: 'CD' | 'DVD';
+  /**
    * Artwork only: overrides the local filename stem (sans _COV.png suffix).
    * For PS1 launcher apps this is the boot ELF name (e.g.
    * "XX.SCUS_944.02.SomeGame.ELF") so the saved file matches the art
@@ -482,7 +488,7 @@ export class JobsService {
 
   private async runPs2DvdJob(job: ImportJob, dirPath: string) {
     const sep = dirPath.includes('\\') ? '\\' : '/';
-    const destinationDir = `${dirPath.replace(/[\\/]$/, '')}${sep}DVD`;
+    const destinationDir = `${dirPath.replace(/[\\/]$/, '')}${sep}${job.discFolder || 'DVD'}`;
 
     window.libraryAPI.onMoveFileProgress((progress) =>
       this.patchJob(job.id, {

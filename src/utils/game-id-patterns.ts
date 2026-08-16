@@ -44,6 +44,7 @@ export const PS2_GAME_ID_REGEX = new RegExp(
 export const FILE_SCAN_CHUNK_BYTES = 1024 * 1024; // 1 MB chunks keep memory usage predictable.
 export const FILE_SCAN_OVERLAP_BYTES = 64; // Overlap to catch IDs spanning chunk boundaries.
 export const VCD_HEADER_SIZE = 1048576; // 1 MB — VCD header before disc data
+export const CD_MAX_BYTES = 737_280_000; // 360,000 sectors × 2048 B — max 80-min CD-ROM (Mode 1/2048) capacity
 
 export function normaliseGameIdForLookup(rawId: string) {
   return rawId.replace("_", "-").replace(/\./g, "").toUpperCase();

@@ -15,6 +15,14 @@ declare interface Window {
       message?: string;
     }>;
 
+    /** Decide whether a PS2 disc image (.iso/.zso) belongs in CD/ or DVD/, by size. */
+    resolveDiscFolder: (filePath: string) => Promise<{
+      success: boolean;
+      folder?: 'CD' | 'DVD';
+      sizeBytes?: number;
+      message?: string;
+    }>;
+
     /** Create OPL folder structure under a root directory. */
     createOplFolders: (
       dirPath: string,

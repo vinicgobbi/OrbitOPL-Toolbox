@@ -3,6 +3,7 @@ import * as fs from "fs/promises";
 import path from "path";
 import { createLogger, formatBytes } from "../logger";
 import { isDirectoryEntry } from "../utils/fs-entry";
+import { CD_MAX_BYTES } from "../utils/game-id-patterns";
 
 const log = createLogger("library");
 
@@ -336,11 +337,15 @@ export async function openAskGameFiles(
   isGameDvd: boolean
 ) {
   const filters = [];
-  if (isGameCd) {
-    filters.push({ name: "CUE Files", extensions: ["cue"] });
-  }
-  if (isGameDvd) {
-    filters.push({ name: "ISO/ZSO Files", extensions: ["iso", "zso"] });
+  if (isGameCd && isGameDvd) {
+    filters.push({ name: "PS2 Disc Images", extensions: ["cue", "iso", "zso"] });
+  } else {
+    if (isGameCd) {
+      filters.push({ name: "CUE Files", extensions: ["cue"] });
+    }
+    if (isGameDvd) {
+      filters.push({ name: "ISO/ZSO Files", extensions: ["iso", "zso"] });
+    }
   }
   const result = await dialog.showOpenDialog({
     properties: ["openFile", "multiSelections"],
@@ -349,6 +354,29 @@ export async function openAskGameFiles(
   });
 
   return result;
+}
+
+/**
+ * Decides whether an already-cooked PS2 disc image (.iso/.zso) belongs in
+ * the CD/ or DVD/ library folder, based on file size against the maximum
+ * capacity of a real CD-ROM.
+ */
+export async function resolveDiscFolder(filePath: string): Promise<{
+  success: boolean;
+  folder?: "CD" | "DVD";
+  sizeBytes?: number;
+  message?: string;
+}> {
+  try {
+    const stat = await fs.stat(filePath);
+    return {
+      success: true,
+      folder: stat.size <= CD_MAX_BYTES ? "CD" : "DVD",
+      sizeBytes: stat.size,
+    };
+  } catch (err: any) {
+    return { success: false, message: err?.message || String(err) };
+  }
 }
 
 export async function moveFile(

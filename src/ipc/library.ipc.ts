@@ -7,6 +7,7 @@ import {
   createOplFolders,
   renameGamefile,
   moveFile,
+  resolveDiscFolder,
 } from "../services/library.service";
 import {
   resolveIsoGameId,
@@ -30,6 +31,10 @@ export function registerLibraryIpc(): void {
 
   ipcMain.handle("check-opl-structure", async (_event, dirPath: string) => {
     return checkOplStructure(dirPath);
+  });
+
+  ipcMain.handle("resolve-disc-folder", async (_event, filePath: string) => {
+    return resolveDiscFolder(filePath);
   });
 
   ipcMain.handle(
