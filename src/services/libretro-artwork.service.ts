@@ -2,6 +2,7 @@ import * as fs from "fs/promises";
 import path from "path";
 import { createLogger, formatBytes } from "../logger";
 import { httpGetBuffer } from "../utils/http-get";
+import { resizeArtForOpl } from "../utils/image-resize";
 import {
   LibretroArtType,
   LibretroSystem,
@@ -97,9 +98,10 @@ export async function downloadArtByGameId(
       if (status !== 200) {
         throw new Error(`Failed to download ${fileName}: ${status}`);
       }
+      const resized = resizeArtForOpl(buffer, type);
       const savePath = path.join(dirPath, `${localName}_${type}.png`);
-      await fs.writeFile(savePath, buffer);
-      log.verbose(`Saved ${type} artwork (${formatBytes(buffer.length)}) → ${savePath}`);
+      await fs.writeFile(savePath, resized);
+      log.verbose(`Saved ${type} artwork (${formatBytes(resized.length)}, resized from ${formatBytes(buffer.length)}) → ${savePath}`);
       results.push({ name: localName, type, url, savedPath: savePath });
     } catch (err: any) {
       log.verbose(`${type} artwork unavailable for ${gameId}: ${err.message}`);
