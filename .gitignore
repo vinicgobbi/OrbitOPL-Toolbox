@@ -104,3 +104,7 @@ CLAUDE.md
 
 # Auto-generated build info
 angular/src/app/shared/build-info.ts
+
+# pnpm is the canonical package manager for the root project;
+# angular/ is a separate npm project and keeps its own package-lock.json.
+/package-lock.json
