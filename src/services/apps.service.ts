@@ -2,6 +2,7 @@ import * as fs from "fs/promises";
 import path from "path";
 import { createLogger } from "../logger";
 import { isDirectoryEntry, resolveEntryType } from "../utils/fs-entry";
+import { GameMetadata, formatReleaseDate, ESRB_AGE } from "./libretro-metadata.service";
 
 const log = createLogger("apps");
 
@@ -268,6 +269,73 @@ export async function updatePs1TitleCfg(
     return { success: true };
   } catch (err: any) {
     log.error(`Failed to update title.cfg:`, err?.message || err);
+    return { success: false, message: err?.message || String(err) };
+  }
+}
+
+/**
+ * Merges descriptive metadata (developer, genre, description, release date,
+ * players, rating) into a launcher's `title.cfg`, preserving `title=`/`boot=`
+ * and any other existing keys — same line-preserving merge approach as
+ * {@link updatePs1TitleCfg}.
+ */
+export async function updateTitleCfgMetadata(
+  launcherPath: string,
+  meta: GameMetadata
+): Promise<{ success: boolean; message?: string }> {
+  // Keyed by lowercase (matches parseTitleCfg's case-insensitive reads);
+  // outKey is the casing written for a brand-new line.
+  const fields: Record<string, { outKey: string; value: string }> = {};
+  if (meta.developer) fields.developer = { outKey: "developer", value: meta.developer };
+  if (meta.genre) fields.genre = { outKey: "genre", value: meta.genre };
+  if (meta.description) fields.description = { outKey: "description", value: meta.description };
+  const release = formatReleaseDate(meta);
+  if (release) fields.release = { outKey: "release", value: release };
+  if (meta.maxPlayers) fields.playerstext = { outKey: "playersText", value: meta.maxPlayers };
+  if (meta.esrbRating) {
+    fields.ratingtext = { outKey: "ratingText", value: meta.esrbRating };
+    if (ESRB_AGE[meta.esrbRating] !== undefined) {
+      fields.rating = { outKey: "rating", value: `esrb/${ESRB_AGE[meta.esrbRating]}` };
+    }
+  }
+
+  if (Object.keys(fields).length === 0) {
+    return { success: true, message: "No metadata fields to write." };
+  }
+
+  try {
+    const cfgPath = path.join(launcherPath, "title.cfg");
+    let oldContent = "";
+    try {
+      oldContent = await fs.readFile(cfgPath, "utf-8");
+    } catch {
+      // No title.cfg yet — write a fresh one below.
+    }
+
+    const seenKeys = new Set<string>();
+    const cfgLines = oldContent.split("\n").map((line) => {
+      const t = line.trimEnd();
+      const eq = t.indexOf("=");
+      if (eq === -1) return line;
+      const k = t.slice(0, eq).trim();
+      const lower = k.toLowerCase();
+      const field = fields[lower];
+      if (field) {
+        seenKeys.add(lower);
+        return `${k}=${field.value}`;
+      }
+      return line;
+    });
+
+    for (const [lower, field] of Object.entries(fields)) {
+      if (!seenKeys.has(lower)) cfgLines.push(`${field.outKey}=${field.value}`);
+    }
+
+    await fs.writeFile(cfgPath, cfgLines.join("\n"), "utf-8");
+    log.info(`Updated title.cfg metadata for ${path.basename(launcherPath)}`);
+    return { success: true };
+  } catch (err: any) {
+    log.error(`Failed to update title.cfg metadata:`, err?.message || err);
     return { success: false, message: err?.message || String(err) };
   }
 }

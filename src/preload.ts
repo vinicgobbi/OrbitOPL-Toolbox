@@ -38,7 +38,8 @@ function buildLibraryAPI() {
       gameId: string,
       system?: "PS1" | "PS2",
       saveAsName?: string,
-      artTypes?: string[]
+      artTypes?: string[],
+      opts?: Record<string, unknown>
     ) =>
       ipcRenderer.invoke(
         "download-art-by-gameid",
@@ -46,12 +47,28 @@ function buildLibraryAPI() {
         gameId,
         system,
         saveAsName,
-        artTypes
+        artTypes,
+        opts
       ),
     checkArtFilesExist: (artDir: string, filenames: string[]) =>
       ipcRenderer.invoke("check-art-files-exist", artDir, filenames),
-    listAvailableArt: (gameId: string, system?: "PS1" | "PS2") =>
-      ipcRenderer.invoke("list-available-art", gameId, system),
+    listAvailableArt: (
+      gameId: string,
+      system?: "PS1" | "PS2",
+      opts?: Record<string, unknown>
+    ) => ipcRenderer.invoke("list-available-art", gameId, system, opts),
+    searchLibretroArt: (system: "PS1" | "PS2", query: string) =>
+      ipcRenderer.invoke("search-libretro-art", system, query),
+    refreshLibretroIndex: (system: "PS1" | "PS2") =>
+      ipcRenderer.invoke("refresh-libretro-index", system),
+
+    // ── Game metadata (libretro-database) ──────────
+    fetchLibretroMetadata: (gameId: string, system: "PS1" | "PS2") =>
+      ipcRenderer.invoke("fetch-libretro-metadata", gameId, system),
+    applyMetadataToGameCfg: (oplRoot: string, gameId: string, meta: Record<string, unknown>) =>
+      ipcRenderer.invoke("apply-metadata-to-game-cfg", oplRoot, gameId, meta),
+    updateTitleCfgMetadata: (launcherPath: string, meta: Record<string, unknown>) =>
+      ipcRenderer.invoke("update-title-cfg-metadata", launcherPath, meta),
 
     // ── Rename ─────────────────────────────────────
     renameGamefile: (

@@ -206,6 +206,7 @@
   <app-artwork-bulk-dialog
     [gameCount]="artworkBulkTargets.length"
     [defaultArtTypes]="_settings.current.defaultArtTypes"
+    [artSource]="_settings.current.artSource"
     (confirm)="onArtworkBulkConfirm($event)"
     (closed)="showArtworkBulkDialog = false"
   ></app-artwork-bulk-dialog>

@@ -35,6 +35,17 @@ export const KNOWN_ART_TYPES = [
   'LGO',
 ];
 
+export type ArtSourceId = 'github' | 'libretro';
+
+/**
+ * Which of the known art types each source can actually provide. libretro-thumbnails
+ * has no small-icon category, so `ICO` is only ever available from `github`.
+ */
+export const SOURCE_SUPPORTED_TYPES: Record<ArtSourceId, string[]> = {
+  github: ['COV', 'COV2', 'COV3', 'ICO', 'SCR', 'SCR2', 'SCR3', 'BG', 'LAB', 'LGO'],
+  libretro: ['COV', 'SCR', 'SCR2'],
+};
+
 export interface ArtworkPreset {
   id: string;
   label: string;

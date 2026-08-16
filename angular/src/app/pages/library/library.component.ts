@@ -72,7 +72,7 @@ export class LibraryComponent {
   }
 
   /** Queues an artwork-download job for each bulk-wizard target with the chosen types. */
-  onArtworkBulkConfirm({ skipExisting }: ArtworkBulkConfirmEvent) {
+  onArtworkBulkConfirm({ skipExisting, fetchMetadata }: ArtworkBulkConfirmEvent) {
     const artTypes = this._settings.current.defaultArtTypes;
     this._jobs.enqueue(
       this.artworkBulkTargets.map((g) => ({
@@ -86,6 +86,9 @@ export class LibraryComponent {
         saveAsName: g.isPs1Launcher ? g.ps1LauncherBoot : undefined,
         skipExisting,
         artTypes,
+        region: g.region,
+        fetchMetadata,
+        launcherPath: g.isPs1Launcher ? g.ps1LauncherPath : undefined,
       }))
     );
     this.showArtworkBulkDialog = false;

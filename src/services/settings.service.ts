@@ -18,6 +18,8 @@ export interface AppSettings {
   namingConvention: "old" | "new";
   /** Art types downloaded by default in bulk artwork operations. */
   defaultArtTypes: string[];
+  /** Which artwork source to pull from. 'github' is the curated OPL-specific database (default). */
+  artSource: "github" | "libretro";
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -25,6 +27,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   autoReconnect: true,
   namingConvention: "new",
   defaultArtTypes: ["COV", "ICO", "SCR"],
+  artSource: "github",
 };
 
 function settingsFilePath(): string {

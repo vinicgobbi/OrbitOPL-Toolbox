@@ -11,7 +11,7 @@
     "postinstall": "electron-builder install-app-deps",
     "commit": "cz commit",
     "electron": "electron",
-    "start": "npm run build:info && npm run build && electron ./dist/src/main.js",
+    "start": "npm run build:info && npm run build && electron ./dist/src/main.js --no-sandbox",
     "build": "tsc",
     "build:watch": "tsc -w",
     "build:info": "node scripts/generate-build-info.js",

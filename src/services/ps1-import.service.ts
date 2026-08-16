@@ -4,7 +4,8 @@ import { mergeMultiBin } from "../utils/binmerge";
 import { convertToVcd } from "../utils/cue2pops";
 import { parseCueSheet, getCueDirectory } from "../utils/cue-parser";
 import { tryDeterminePs1GameIdFromHex } from "./game-id-resolver.service";
-import { downloadArtByGameId } from "./artwork.service";
+import { downloadArt } from "./artwork-router.service";
+import { mapGameIdToRegion } from "../utils/region";
 import { sanitizeGameFilename } from "../utils/sanitize";
 import { describeFileAccessError } from "../utils/file-access-error";
 import { createLogger } from "../logger";
@@ -155,7 +156,10 @@ export async function importPs1Game(
     if (downloadArtwork) {
       if (onProgress) onProgress(93, "Downloading artwork");
       try {
-        await downloadArtByGameId(artDir, gameId, "PS1", elfFilename, ["COV"]);
+        await downloadArt(artDir, gameId, "PS1", elfFilename, ["COV"], {
+          title: gameName,
+          region: mapGameIdToRegion(gameId),
+        });
       } catch {
         // Art download failure is non-critical
       }

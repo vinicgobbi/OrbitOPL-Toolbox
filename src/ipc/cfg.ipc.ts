@@ -3,7 +3,14 @@ import { readGameCfg, writeGameCfg, GameCfg } from "../services/cfg.service";
 import {
   readAppTitleCfg,
   updatePs1TitleCfg,
+  updateTitleCfgMetadata,
 } from "../services/apps.service";
+import {
+  lookupMetadata,
+  applyMetadataToGameCfg,
+  GameMetadata,
+} from "../services/libretro-metadata.service";
+import { LibretroSystem } from "../services/libretro-index.service";
 
 export function registerCfgIpc(): void {
   ipcMain.handle(
@@ -31,6 +38,27 @@ export function registerCfgIpc(): void {
     "update-ps1-title-cfg",
     async (_event, launcherPath: string, newTitle: string, gameId?: string) => {
       return updatePs1TitleCfg(launcherPath, newTitle, gameId);
+    }
+  );
+
+  ipcMain.handle(
+    "fetch-libretro-metadata",
+    async (_event, gameId: string, system: LibretroSystem) => {
+      return lookupMetadata(system, gameId);
+    }
+  );
+
+  ipcMain.handle(
+    "apply-metadata-to-game-cfg",
+    async (_event, oplRoot: string, gameId: string, meta: GameMetadata) => {
+      return applyMetadataToGameCfg(oplRoot, gameId, meta);
+    }
+  );
+
+  ipcMain.handle(
+    "update-title-cfg-metadata",
+    async (_event, launcherPath: string, meta: GameMetadata) => {
+      return updateTitleCfgMetadata(launcherPath, meta);
     }
   );
 }
