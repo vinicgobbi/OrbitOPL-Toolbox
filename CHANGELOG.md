@@ -1,3 +1,9 @@
+## v1.5.0-a2+3fef0a5 (2026-08-16)
+
+### Feat
+
+- integrate libretro metadata and artwork sources
+
 ## v1.5.0-a1+9cfea12 (2026-08-16)
 
 ### Feat
