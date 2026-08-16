@@ -1,3 +1,9 @@
+## v1.5.0-a3+2dbe444 (2026-08-16)
+
+### Feat
+
+- adicionar função de redimensionamento de arte para OPL e integrá-la no download de arte
+
 ## v1.5.0-a2+3fef0a5 (2026-08-16)
 
 ### Feat
