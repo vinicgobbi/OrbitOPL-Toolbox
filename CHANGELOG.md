@@ -1,3 +1,9 @@
+## v1.5.0-a1+9cfea12 (2026-08-16)
+
+### Feat
+
+- adicionar suporte para importação de imagens de disco PS2 com roteamento para pastas CD/DVD
+
 ## v1.5.0-a0+502040e (2026-08-15)
 
 ### Feat
