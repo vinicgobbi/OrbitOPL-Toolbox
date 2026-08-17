@@ -1,3 +1,10 @@
+## v1.5.0-a4+439c04b (2026-08-17)
+
+### Refactor
+
+- tidy Angular component structure and finish @shared alias adoption
+- group backend ipc/services by feature domain
+
 ## v1.5.0-a3+2dbe444 (2026-08-16)
 
 ### Feat
