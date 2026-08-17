@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
-import { LibraryService } from '../../shared/services/library.service';
-import { JobsService } from '../../shared/services/jobs.service';
-import { SettingsService } from '../../shared/services/settings.service';
+import { LibraryService } from '@shared/services/library.service';
+import { JobsService } from '@shared/services/jobs.service';
+import { SettingsService } from '@shared/services/settings.service';
 import { AsyncPipe } from '@angular/common';
 
 type DiscMode = 'ps2' | 'ps1' | 'apps';

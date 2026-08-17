@@ -184,12 +184,12 @@
         [class.library-list]="viewMode === 'list'"
       >
         @for (item of visibleGames$ | async; track item.path || item.gameId) {
-          <app-gamecard
+          <app-game-card
             [game]="item"
             [viewMode]="viewMode"
             (viewDetails)="viewGameDetails($event)"
             [class.list-card]="viewMode === 'list'"
-          ></app-gamecard>
+          ></app-game-card>
         }
       </div>
     }

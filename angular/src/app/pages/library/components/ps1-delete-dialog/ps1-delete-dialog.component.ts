@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Game } from '@shared/types/game.type';
-import { BaseDeleteDialogComponent, DeleteEntry } from '../delete-dialog-base';
+import { BaseDeleteDialogComponent, DeleteEntry } from '../delete-dialog-base/delete-dialog-base';
 
 /**
  * Delete-progress dialog for PS1 launcher apps.

@@ -2,20 +2,20 @@ import { importProvidersFrom } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LucideAngularModule, icons } from 'lucide-angular';
 
-import { GamecardComponent } from './gamecard.component';
+import { GameCardComponent } from './game-card.component';
 
-describe('GamecardComponent', () => {
-  let component: GamecardComponent;
-  let fixture: ComponentFixture<GamecardComponent>;
+describe('GameCardComponent', () => {
+  let component: GameCardComponent;
+  let fixture: ComponentFixture<GameCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GamecardComponent],
+      imports: [GameCardComponent],
       providers: [importProvidersFrom(LucideAngularModule.pick(icons))],
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GamecardComponent);
+    fixture = TestBed.createComponent(GameCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

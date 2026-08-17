@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { Observable } from 'rxjs';
-import { SettingsService } from '../../shared/services/settings.service';
-import { LogsService } from '../../shared/services/logs.service';
-import { UpdateService } from '../../shared/services/update.service';
+import { SettingsService } from '@shared/services/settings.service';
+import { LogsService } from '@shared/services/logs.service';
+import { UpdateService } from '@shared/services/update.service';
 import {
   KNOWN_ART_TYPES,
   SOURCE_SUPPORTED_TYPES,

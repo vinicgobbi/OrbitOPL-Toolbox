@@ -19,7 +19,7 @@ import { Ps1DeleteDialogComponent } from '../ps1-delete-dialog/ps1-delete-dialog
 import { AppDeleteDialogComponent } from '../app-delete-dialog/app-delete-dialog.component';
 import { ArtworkWizardDialogComponent } from '../artwork-wizard-dialog/artwork-wizard-dialog.component';
 
-export type GamecardViewMode = 'grid' | 'list';
+export type GameCardViewMode = 'grid' | 'list';
 
 /**
  * Displays a single game in either grid or list view.
@@ -29,7 +29,7 @@ export type GamecardViewMode = 'grid' | 'list';
  * fetching, ZSO compression, and deletion (PS2 / PS1 / App variants).
  */
 @Component({
-  selector: 'app-gamecard',
+  selector: 'app-game-card',
   imports: [
     LucideAngularModule,
     GameCfgDialogComponent,
@@ -38,16 +38,16 @@ export type GamecardViewMode = 'grid' | 'list';
     AppDeleteDialogComponent,
     ArtworkWizardDialogComponent,
   ],
-  templateUrl: './gamecard.component.html',
-  styleUrl: './gamecard.component.scss',
+  templateUrl: './game-card.component.html',
+  styleUrl: './game-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GamecardComponent {
+export class GameCardComponent {
   /** The game data to render — undefined while the library is loading. */
   readonly game = input<Game | undefined>(undefined);
 
   /** Whether the library is currently in grid or list view. */
-  readonly viewMode = input<GamecardViewMode>('grid');
+  readonly viewMode = input<GameCardViewMode>('grid');
 
   /** Emitted when the user clicks the card body to view details. */
   readonly viewDetails = output<Game>();

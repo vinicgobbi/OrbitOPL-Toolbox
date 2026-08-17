@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
-import { BuildInfo } from '../../shared/build-info';
+import { BuildInfo } from '@shared/build-info';
 
 @Component({
   selector: 'app-info',
