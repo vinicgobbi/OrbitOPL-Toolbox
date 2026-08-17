@@ -100,6 +100,80 @@
         </div>
       </div>
 
+      <!-- ── Artwork Source ──────────────────────────────────────── -->
+      <div class="glass rounded-box">
+        <div class="card-body">
+          <h2 class="card-title text-base">
+            <i-lucide name="database" size="20" class="text-accent"></i-lucide>
+            Artwork Source
+          </h2>
+          <p class="text-sm text-base-content/60">
+            Where covers and screenshots are downloaded from.
+          </p>
+
+          <div class="mt-2 flex flex-col gap-2">
+            <label
+              class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
+            >
+              <input
+                type="radio"
+                name="art_source"
+                class="radio radio-primary radio-sm mt-0.5"
+                [checked]="(settings$ | async)?.artSource !== 'libretro'"
+                (change)="onArtSourceChange('github')"
+              />
+              <span class="leading-tight">
+                <span class="text-sm">PSX / PS2 OPL Art Database (default)</span>
+                <span class="block text-[0.68rem] text-base-content/55">
+                  Curated specifically for OPL, matched exactly by GAMEID.
+                </span>
+              </span>
+            </label>
+            <label
+              class="flex cursor-pointer items-start gap-2 rounded-md p-2 hover:bg-base-100/40"
+            >
+              <input
+                type="radio"
+                name="art_source"
+                class="radio radio-primary radio-sm mt-0.5"
+                [checked]="(settings$ | async)?.artSource === 'libretro'"
+                (change)="onArtSourceChange('libretro')"
+              />
+              <span class="leading-tight">
+                <span class="text-sm">libretro-thumbnails (RetroArch)</span>
+                <span class="block text-[0.68rem] text-base-content/55">
+                  Larger community set, no account needed. No small icon (ICO)
+                  art, and title-based matching may occasionally miss —
+                  manual search is offered as a fallback. Also enables
+                  fetching game info (genre, developer, description...) from
+                  libretro-database.
+                </span>
+              </span>
+            </label>
+          </div>
+
+          @if ((settings$ | async)?.artSource === 'libretro') {
+          <div class="mt-2 flex items-center justify-between gap-4">
+            <p class="text-[0.72rem] text-base-content/50">
+              Filenames are indexed once and cached locally for a week.
+            </p>
+            <button
+              class="btn btn-outline btn-xs"
+              [disabled]="refreshingIndex"
+              (click)="refreshArtIndex()"
+            >
+              @if (refreshingIndex) {
+              <span class="loading loading-spinner loading-xs"></span>
+              } @else {
+              <i-lucide name="refresh-cw" size="13"></i-lucide>
+              }
+              Refresh index
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+
       <!-- ── Artwork ─────────────────────────────────────────────── -->
       <div class="glass rounded-box">
         <div class="card-body">
@@ -114,16 +188,22 @@
           <div class="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
             @for (type of knownArtTypes; track type) {
               <label
-                class="flex cursor-pointer items-center gap-2 rounded-md p-2 hover:bg-base-100/40"
+                class="flex items-center gap-2 rounded-md p-2 hover:bg-base-100/40"
+                [class.cursor-pointer]="isArtTypeSupported(type)"
+                [class.opacity-40]="!isArtTypeSupported(type)"
               >
                 <input
                   type="checkbox"
                   class="checkbox checkbox-sm checkbox-primary"
                   [checked]="isArtTypeSelected(type)"
+                  [disabled]="!isArtTypeSupported(type)"
                   (change)="toggleDefaultArtType(type)"
                 />
                 <span class="text-sm">{{ artTypeLabel(type) }}</span>
                 <span class="font-mono text-[0.65rem] text-base-content/40">{{ type }}</span>
+                @if (!isArtTypeSupported(type)) {
+                <span class="text-[0.65rem] text-base-content/40 italic">not available from this source</span>
+                }
               </label>
             }
           </div>

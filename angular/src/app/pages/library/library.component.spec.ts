@@ -4,8 +4,8 @@ import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import type { ComponentFixture } from '@angular/core/testing';
 import { LucideAngularModule, icons } from 'lucide-angular';
 
-import { LibraryService } from '../../shared/services/library.service';
-import type { Game } from '../../shared/types/game.type';
+import { LibraryService } from '@shared/services/library.service';
+import type { Game } from '@shared/types/game.type';
 
 import { LibraryComponent } from './library.component';
 

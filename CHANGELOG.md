@@ -1,3 +1,34 @@
+## v1.5.0-a4+439c04b (2026-08-17)
+
+### Refactor
+
+- tidy Angular component structure and finish @shared alias adoption
+- group backend ipc/services by feature domain
+
+## v1.5.0-a3+2dbe444 (2026-08-16)
+
+### Feat
+
+- adicionar função de redimensionamento de arte para OPL e integrá-la no download de arte
+
+## v1.5.0-a2+3fef0a5 (2026-08-16)
+
+### Feat
+
+- integrate libretro metadata and artwork sources
+
+## v1.5.0-a1+9cfea12 (2026-08-16)
+
+### Feat
+
+- adicionar suporte para importação de imagens de disco PS2 com roteamento para pastas CD/DVD
+
+## v1.5.0-a0+502040e (2026-08-15)
+
+### Feat
+
+- update pnpm workspace and IPC dialog handling
+
 ## v1.4.0 (2026-08-15)
 
 ### Feat

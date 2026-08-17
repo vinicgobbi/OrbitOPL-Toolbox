@@ -6,7 +6,7 @@
 # develop the app, then installs the npm dependencies for both the Electron
 # root project and the Angular renderer.
 #
-# Usage:  ./scripts/setup.sh        (or:  npm run setup)
+# Usage:  ./scripts/setup.sh        (or:  pnpm run setup)
 #
 set -euo pipefail
 
@@ -122,7 +122,7 @@ esac
 # ── npm dependencies (root + angular) ───────────────────────────────────────
 bold "Installing npm dependencies"
 info "Root (Electron) project…"
-( cd "$ROOT_DIR" && npm install )
+( cd "$ROOT_DIR" && pnpm install )
 ok "Root dependencies installed."
 
 info "Angular renderer…"
@@ -132,5 +132,5 @@ ok "Angular dependencies installed."
 bold "✅ Setup complete!"
 echo
 echo "Next steps:"
-echo "  npm run app:serve   # start the app in dev mode (hot reload)"
-echo "  npm start           # build once and launch"
+echo "  pnpm run app:serve   # start the app in dev mode (hot reload)"
+echo "  pnpm start           # build once and launch"

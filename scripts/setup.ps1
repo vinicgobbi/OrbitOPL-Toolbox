@@ -7,7 +7,7 @@
 #
 # Usage (from a PowerShell prompt in the repo root):
 #   powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
-#   - or -   npm run setup
+#   - or -   pnpm run setup
 #
 $ErrorActionPreference = "Stop"
 
@@ -86,7 +86,7 @@ if (Test-Have git) {
 Write-Bold "Installing npm dependencies"
 Write-Info "Root (Electron) project..."
 Push-Location $RootDir
-npm install
+pnpm install
 Pop-Location
 Write-Ok "Root dependencies installed."
 
@@ -99,5 +99,5 @@ Write-Ok "Angular dependencies installed."
 Write-Bold "Setup complete!"
 Write-Host ""
 Write-Host "Next steps:"
-Write-Host "  npm run app:serve   # start the app in dev mode (hot reload)"
-Write-Host "  npm start           # build once and launch"
+Write-Host "  pnpm run app:serve   # start the app in dev mode (hot reload)"
+Write-Host "  pnpm start           # build once and launch"

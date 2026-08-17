@@ -2,7 +2,7 @@
 declare interface Window {
   libraryAPI: {
     /** Open native directory picker. */
-    openAskDirectory: () => Promise<any>;
+    openAskDirectory: (options?: { defaultPath?: string }) => Promise<any>;
 
     /** List game files in a directory. */
     getGamesFiles: (dirPath: string) => Promise<any>;
@@ -12,6 +12,14 @@ declare interface Window {
       success: boolean;
       existing?: string[];
       missing?: string[];
+      message?: string;
+    }>;
+
+    /** Decide whether a PS2 disc image (.iso/.zso) belongs in CD/ or DVD/, by size. */
+    resolveDiscFolder: (filePath: string) => Promise<{
+      success: boolean;
+      folder?: 'CD' | 'DVD';
+      sizeBytes?: number;
       message?: string;
     }>;
 
@@ -88,6 +96,7 @@ declare interface Window {
       system?: 'PS1' | 'PS2',
       saveAsName?: string,
       artTypes?: string[],
+      opts?: ArtSourceOpts,
     ) => Promise<any>;
 
     /** Check which of the given filenames exist in the art directory. */
@@ -100,11 +109,42 @@ declare interface Window {
     listAvailableArt: (
       gameId: string,
       system?: 'PS1' | 'PS2',
+      opts?: ArtSourceOpts,
     ) => Promise<{
       success: boolean;
       data: { type: string; fileName: string; downloadUrl: string }[];
       message?: string;
     }>;
+
+    /** Case-insensitive substring search across libretro-thumbnails filenames, for manual matching. */
+    searchLibretroArt: (
+      system: 'PS1' | 'PS2',
+      query: string,
+    ) => Promise<{ type: string; fileName: string }[]>;
+
+    /** Force a refresh of the cached libretro-thumbnails filename index. */
+    refreshLibretroIndex: (
+      system: 'PS1' | 'PS2',
+    ) => Promise<{ success: boolean }>;
+
+    /** Fetch descriptive game metadata (developer, genre, description, ...) from libretro-database. */
+    fetchLibretroMetadata: (
+      gameId: string,
+      system: 'PS1' | 'PS2',
+    ) => Promise<{ success: boolean; data?: GameMetadata; message?: string }>;
+
+    /** Merge fetched metadata into a PS2 game's `CFG/<gameId>.cfg`. */
+    applyMetadataToGameCfg: (
+      oplRoot: string,
+      gameId: string,
+      meta: GameMetadata,
+    ) => Promise<{ success: boolean; message?: string }>;
+
+    /** Merge fetched metadata into a PS1 launcher's `title.cfg`. */
+    updateTitleCfgMetadata: (
+      launcherPath: string,
+      meta: GameMetadata,
+    ) => Promise<{ success: boolean; message?: string }>;
 
     /** Try to determine a game ID from a binary file via hex patterns. */
     tryDetermineGameIdFromHex: (filepath: string) => Promise<any>;
@@ -432,5 +472,29 @@ declare interface AppSettings {
   namingConvention: "old" | "new";
   /** Art types downloaded by default in bulk artwork operations. */
   defaultArtTypes: string[];
+  /** Which artwork source to pull from. 'github' is the curated OPL-specific database (default). */
+  artSource: "github" | "libretro";
+}
+
+/** Extra context a name-based art source (libretro-thumbnails) uses to resolve the right file. */
+declare interface ArtSourceOpts {
+  source?: "github" | "libretro";
+  title?: string;
+  region?: "NTSC-U" | "PAL" | "NTSC-J" | "UNKNOWN";
+  manualFileNames?: Record<string, string>;
+}
+
+/** Descriptive game metadata resolved from libretro-database (PS2 has no `esrbRating` source). */
+declare interface GameMetadata {
+  name?: string;
+  description?: string;
+  developer?: string;
+  publisher?: string;
+  releaseYear?: string;
+  releaseMonth?: string;
+  releaseDay?: string;
+  maxPlayers?: string;
+  genre?: string;
+  esrbRating?: string;
 }
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LogEntry, LogsService } from '../../shared/services/logs.service';
+import { LogEntry, LogsService } from '@shared/services/logs.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';

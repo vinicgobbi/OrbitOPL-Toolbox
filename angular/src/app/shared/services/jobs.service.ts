@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, map } from 'rxjs';
 import { LogsService } from './logs.service';
 import { LibraryService } from './library.service';
 import { ConfirmDialogService } from './confirm-dialog.service';
+import { SettingsService } from './settings.service';
 
 export type ImportJobType =
   | 'ps2-dvd'
@@ -45,12 +46,31 @@ export interface ImportJob {
    */
   keepOriginalName?: boolean;
   /**
+   * PS2 DVD-type jobs only: destination subfolder for an already-cooked
+   * disc image, resolved by file size. Defaults to 'DVD' when unset (e.g.
+   * jobs created before this field existed).
+   */
+  discFolder?: 'CD' | 'DVD';
+  /**
    * Artwork only: overrides the local filename stem (sans _COV.png suffix).
    * For PS1 launcher apps this is the boot ELF name (e.g.
    * "XX.SCUS_944.02.SomeGame.ELF") so the saved file matches the art
    * matching logic in updateArtForGame.
    */
   saveAsName?: string;
+  /** Artwork only: game region, used by name-based sources (libretro) to rank matches. */
+  region?: 'NTSC-U' | 'PAL' | 'NTSC-J' | 'UNKNOWN';
+  /** Artwork only: exact filenames picked from a manual libretro search, keyed by type code. */
+  manualFileNames?: Record<string, string>;
+  /**
+   * Artwork only: also fetch descriptive metadata (developer, genre,
+   * description, release date, players, rating) from libretro-database and
+   * merge it into the game's OPL CFG / title.cfg. Only applies when the
+   * active art source is 'libretro'.
+   */
+  fetchMetadata?: boolean;
+  /** Artwork only (PS1 launchers): folder holding the launcher's title.cfg, for metadata writes. */
+  launcherPath?: string;
   status: JobStatus;
   percent: number;
   stage: string;
@@ -111,6 +131,7 @@ export class JobsService {
     private readonly _logger: LogsService,
     private readonly _library: LibraryService,
     private readonly _confirm: ConfirmDialogService,
+    private readonly _settings: SettingsService,
   ) {}
 
   /** Queue one or more imports (as a single batch) and kick the worker if idle. */
@@ -369,12 +390,19 @@ export class JobsService {
 
     this.patchJob(job.id, { stage: 'Downloading artwork…', percent: 50 });
 
+    const artSource = this._settings.current.artSource ?? 'github';
     const result = await window.libraryAPI.downloadArtByGameId(
       artDir,
       job.gameId,
       job.system ?? 'PS2',
       saveAsName,
       downloadTypes,
+      {
+        source: artSource,
+        title: job.gameName,
+        region: job.region,
+        manualFileNames: job.manualFileNames,
+      },
     );
 
     if (result?.data) {
@@ -397,7 +425,7 @@ export class JobsService {
         this._logger.log('jobsService', `  ✗ ${item.type}: ${item.error}`);
       }
 
-      if (saved.length === 0) {
+      if (saved.length === 0 && !job.fetchMetadata) {
         return {
           success: false,
           message: `No artwork found for ${job.label} (${job.gameId}) in the ${job.system ?? 'PS2'} database.`,
@@ -405,10 +433,70 @@ export class JobsService {
       }
     }
 
-    const message = isOverwrite
-      ? 'Artwork overwritten.'
-      : 'Artwork downloaded.';
+    let metadataMessage: string | undefined;
+    if (job.fetchMetadata && artSource === 'libretro') {
+      metadataMessage = await this.fetchAndApplyMetadata(job, dirPath);
+    }
+
+    const message = [
+      isOverwrite ? 'Artwork overwritten.' : 'Artwork downloaded.',
+      metadataMessage,
+    ]
+      .filter(Boolean)
+      .join(' ');
     return { success: true, message };
+  }
+
+  /** Fetches libretro-database metadata for a job's game and merges it into the OPL CFG / title.cfg. Never fails the job. */
+  private async fetchAndApplyMetadata(
+    job: ImportJob,
+    dirPath: string,
+  ): Promise<string | undefined> {
+    try {
+      const system = job.system ?? 'PS2';
+      const result = await window.libraryAPI.fetchLibretroMetadata(
+        job.gameId,
+        system,
+      );
+      if (!result?.success || !result.data) {
+        this._logger.log(
+          'jobsService',
+          `No metadata found for "${job.label}" (${job.gameId})`,
+        );
+        return 'No game info found.';
+      }
+
+      const writeResult = job.launcherPath
+        ? await window.libraryAPI.updateTitleCfgMetadata(
+            job.launcherPath,
+            result.data,
+          )
+        : await window.libraryAPI.applyMetadataToGameCfg(
+            dirPath,
+            job.gameId,
+            result.data,
+          );
+
+      if (!writeResult?.success) {
+        this._logger.error(
+          'jobsService',
+          `Failed to write metadata for "${job.label}": ${writeResult?.message}`,
+        );
+        return 'Game info found but could not be saved.';
+      }
+
+      this._logger.log(
+        'jobsService',
+        `Applied game info for "${job.label}" (${job.gameId})`,
+      );
+      return 'Game info updated.';
+    } catch (error: any) {
+      this._logger.error(
+        'jobsService',
+        `Metadata fetch threw for "${job.label}": ${error?.message || error}`,
+      );
+      return 'Game info fetch failed.';
+    }
   }
 
   private async runRenameJob(job: ImportJob) {
@@ -482,7 +570,7 @@ export class JobsService {
 
   private async runPs2DvdJob(job: ImportJob, dirPath: string) {
     const sep = dirPath.includes('\\') ? '\\' : '/';
-    const destinationDir = `${dirPath.replace(/[\\/]$/, '')}${sep}DVD`;
+    const destinationDir = `${dirPath.replace(/[\\/]$/, '')}${sep}${job.discFolder || 'DVD'}`;
 
     window.libraryAPI.onMoveFileProgress((progress) =>
       this.patchJob(job.id, {
@@ -530,6 +618,13 @@ export class JobsService {
           `${dirPath}/ART`,
           job.gameId,
           'PS2',
+          undefined,
+          undefined,
+          {
+            source: this._settings.current.artSource ?? 'github',
+            title: job.gameName,
+            region: job.region,
+          },
         );
       }
 

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import { LibraryService } from '../../shared/services/library.service';
+import { LibraryService } from '@shared/services/library.service';
 import {
   JobsService,
   NewImportJob,
-} from '../../shared/services/jobs.service';
-import { SettingsService } from '../../shared/services/settings.service';
+} from '@shared/services/jobs.service';
+import { SettingsService } from '@shared/services/settings.service';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';

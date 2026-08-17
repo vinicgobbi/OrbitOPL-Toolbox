@@ -208,7 +208,7 @@ app-root {
   flex-shrink: 0;
   border-bottom: 1px solid oklch(60% 0.08 250 / 0.14);
   border-radius: 0;
-  /* Sit above in-content dropdowns (gamecard menu uses z-10). */
+  /* Sit above in-content dropdowns (game-card menu uses z-10). */
   position: relative;
   z-index: 20;
 }

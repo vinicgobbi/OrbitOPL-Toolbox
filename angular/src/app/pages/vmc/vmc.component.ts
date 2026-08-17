@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { LibraryService } from '../../shared/services/library.service';
-import { VMC_SIZES_MB, VmcService } from '../../shared/services/vmc.service';
+import { LibraryService } from '@shared/services/library.service';
+import { VMC_SIZES_MB, VmcService } from '@shared/services/vmc.service';
 
 @Component({
   selector: 'app-vmc',

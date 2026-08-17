@@ -1,20 +1,20 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  GamecardComponent,
-  GamecardViewMode,
-} from './components/gamecard/gamecard.component';
+  GameCardComponent,
+  GameCardViewMode,
+} from './components/game-card/game-card.component';
 import { LibraryRenameDialogComponent } from './components/rename-dialog/rename-dialog.component';
 import {
   ArtworkBulkDialogComponent,
   ArtworkBulkConfirmEvent,
 } from './components/artwork-bulk-dialog/artwork-bulk-dialog.component';
-import { LibraryService } from '../../shared/services/library.service';
-import { JobsService } from '../../shared/services/jobs.service';
-import { SettingsService } from '../../shared/services/settings.service';
+import { LibraryService } from '@shared/services/library.service';
+import { JobsService } from '@shared/services/jobs.service';
+import { SettingsService } from '@shared/services/settings.service';
 import { AsyncPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { Game } from '../../shared/types/game.type';
+import { Game } from '@shared/types/game.type';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 
 type SystemTab = 'PS2' | 'PS1' | 'APPS';
@@ -23,7 +23,7 @@ type SortMode = 'title-asc' | 'title-desc' | 'gameId-asc' | 'gameId-desc';
 @Component({
   selector: 'app-library',
   imports: [
-    GamecardComponent,
+    GameCardComponent,
     LibraryRenameDialogComponent,
     ArtworkBulkDialogComponent,
     AsyncPipe,
@@ -72,7 +72,7 @@ export class LibraryComponent {
   }
 
   /** Queues an artwork-download job for each bulk-wizard target with the chosen types. */
-  onArtworkBulkConfirm({ skipExisting }: ArtworkBulkConfirmEvent) {
+  onArtworkBulkConfirm({ skipExisting, fetchMetadata }: ArtworkBulkConfirmEvent) {
     const artTypes = this._settings.current.defaultArtTypes;
     this._jobs.enqueue(
       this.artworkBulkTargets.map((g) => ({
@@ -86,6 +86,9 @@ export class LibraryComponent {
         saveAsName: g.isPs1Launcher ? g.ps1LauncherBoot : undefined,
         skipExisting,
         artTypes,
+        region: g.region,
+        fetchMetadata,
+        launcherPath: g.isPs1Launcher ? g.ps1LauncherPath : undefined,
       }))
     );
     this.showArtworkBulkDialog = false;
@@ -126,7 +129,7 @@ export class LibraryComponent {
   public sortMode$ = this.sortModeSubject.asObservable();
   private searchSubject = new BehaviorSubject<string>('');
   public search$ = this.searchSubject.asObservable();
-  public viewMode: GamecardViewMode = 'grid';
+  public viewMode: GameCardViewMode = 'grid';
   public sortMode: SortMode = 'title-asc';
   public searchTerm = '';
 
