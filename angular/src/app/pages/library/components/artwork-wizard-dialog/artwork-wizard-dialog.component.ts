@@ -3,7 +3,6 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Game } from '@shared/types/game.type';
 import { JobsService } from '@shared/services/jobs.service';
 import { LibraryService } from '@shared/services/library.service';
-import { SettingsService } from '@shared/services/settings.service';
 import {
   ARTWORK_PRESETS,
   artTypeLabel,
@@ -36,21 +35,11 @@ export class ArtworkWizardDialogComponent {
   readonly skipExisting = signal(false);
   readonly fetchMetadata = signal(true);
 
-  readonly showManualSearch = signal(false);
-  readonly manualQuery = signal('');
-  readonly manualSearching = signal(false);
-  readonly manualResults = signal<{ type: string; fileName: string }[]>([]);
-  private manualFileNames: Record<string, string> = {};
-
   readonly selectedCount = computed(() => this.selected().size);
-  readonly isLibretroSource = computed(
-    () => this._settings.current.artSource === 'libretro',
-  );
 
   constructor(
     private readonly _jobs: JobsService,
     private readonly _library: LibraryService,
-    private readonly _settings: SettingsService,
   ) {}
 
   private get isPs1Launcher(): boolean {
@@ -67,22 +56,13 @@ export class ArtworkWizardDialogComponent {
       : this.game().gameId;
   }
 
-  private get source(): 'github' | 'libretro' {
-    return this._settings.current.artSource ?? 'github';
-  }
-
   async ngOnInit() {
     await this.loadOptions();
   }
 
   private async loadOptions(): Promise<void> {
     const g = this.game();
-    const result = await window.libraryAPI.listAvailableArt(g.gameId, this.system, {
-      source: this.source,
-      title: g.title,
-      region: g.region,
-      manualFileNames: this.manualFileNames,
-    });
+    const result = await window.libraryAPI.listAvailableArt(g.gameId, this.system);
 
     if (!result?.success) {
       this.errorMessage.set(result?.message || 'Failed to load available artwork.');
@@ -114,26 +94,6 @@ export class ArtworkWizardDialogComponent {
     this.selected.set(new Set(result.data.map((d) => d.type)));
     this.errorMessage.set(null);
     this.loading.set(false);
-  }
-
-  async runManualSearch(): Promise<void> {
-    const query = this.manualQuery().trim();
-    if (!query) return;
-    this.manualSearching.set(true);
-    try {
-      const results = await window.libraryAPI.searchLibretroArt(this.system, query);
-      this.manualResults.set(results);
-    } finally {
-      this.manualSearching.set(false);
-    }
-  }
-
-  async pickManualResult(match: { type: string; fileName: string }): Promise<void> {
-    this.manualFileNames = { ...this.manualFileNames, [match.type]: match.fileName };
-    this.manualResults.set([]);
-    this.manualQuery.set('');
-    this.loading.set(true);
-    await this.loadOptions();
   }
 
   isSelected(type: string): boolean {
@@ -178,9 +138,7 @@ export class ArtworkWizardDialogComponent {
         saveAsName: this.isPs1Launcher ? g.ps1LauncherBoot : undefined,
         artTypes: types,
         skipExisting: this.skipExisting(),
-        region: g.region,
-        manualFileNames: this.manualFileNames,
-        fetchMetadata: this.isLibretroSource() && this.fetchMetadata(),
+        fetchMetadata: this.fetchMetadata(),
         launcherPath: this.isPs1Launcher ? g.ps1LauncherPath : undefined,
       },
     ]);

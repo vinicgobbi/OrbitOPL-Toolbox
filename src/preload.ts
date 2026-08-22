@@ -38,8 +38,7 @@ function buildLibraryAPI() {
       gameId: string,
       system?: "PS1" | "PS2",
       saveAsName?: string,
-      artTypes?: string[],
-      opts?: Record<string, unknown>
+      artTypes?: string[]
     ) =>
       ipcRenderer.invoke(
         "download-art-by-gameid",
@@ -47,20 +46,12 @@ function buildLibraryAPI() {
         gameId,
         system,
         saveAsName,
-        artTypes,
-        opts
+        artTypes
       ),
     checkArtFilesExist: (artDir: string, filenames: string[]) =>
       ipcRenderer.invoke("check-art-files-exist", artDir, filenames),
-    listAvailableArt: (
-      gameId: string,
-      system?: "PS1" | "PS2",
-      opts?: Record<string, unknown>
-    ) => ipcRenderer.invoke("list-available-art", gameId, system, opts),
-    searchLibretroArt: (system: "PS1" | "PS2", query: string) =>
-      ipcRenderer.invoke("search-libretro-art", system, query),
-    refreshLibretroIndex: (system: "PS1" | "PS2") =>
-      ipcRenderer.invoke("refresh-libretro-index", system),
+    listAvailableArt: (gameId: string, system?: "PS1" | "PS2") =>
+      ipcRenderer.invoke("list-available-art", gameId, system),
 
     // ── Game metadata (libretro-database) ──────────
     fetchLibretroMetadata: (gameId: string, system: "PS1" | "PS2") =>

@@ -37,18 +37,16 @@
       <span class="text-[0.65rem] text-base-content/40">— don't prompt to overwrite, just skip types already on disk</span>
     </label>
 
-    @if (artSource() === 'libretro') {
-      <label class="flex items-center gap-2 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          class="checkbox checkbox-sm checkbox-primary"
-          [checked]="fetchMetadata()"
-          (change)="fetchMetadata.set(!fetchMetadata())"
-        />
-        <span class="text-xs text-base-content/70">Also fetch game info</span>
-        <span class="text-[0.65rem] text-base-content/40">— genre, developer, description, release date, players</span>
-      </label>
-    }
+    <label class="flex items-center gap-2 cursor-pointer select-none">
+      <input
+        type="checkbox"
+        class="checkbox checkbox-sm checkbox-primary"
+        [checked]="fetchMetadata()"
+        (change)="fetchMetadata.set(!fetchMetadata())"
+      />
+      <span class="text-xs text-base-content/70">Also fetch game info</span>
+      <span class="text-[0.65rem] text-base-content/40">— genre, developer, description, release date, players</span>
+    </label>
   </div>
 
   <div class="flex items-center justify-end gap-2 border-t border-base-content/10 px-5 py-3">

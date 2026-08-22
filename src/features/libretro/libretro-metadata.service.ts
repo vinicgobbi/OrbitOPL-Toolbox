@@ -4,7 +4,6 @@ import { app } from "electron";
 import { createLogger } from "../../logger";
 import { httpGetText } from "../../utils/http-get";
 import { normaliseGameIdForLookup } from "../../utils/game-id-patterns";
-import { LibretroSystem } from "./libretro-index.service";
 import { readGameCfg, writeGameCfg } from "../library/cfg.service";
 
 const log = createLogger("libretro-metadata");
@@ -15,6 +14,8 @@ const log = createLogger("libretro-metadata");
  * DAT files, joined by GAMEID serial (no fuzzy matching, no auth needed).
  * PS2 has no ESRB source in this repo — `esrbRating` stays undefined there.
  */
+
+export type LibretroSystem = "PS1" | "PS2";
 
 export interface GameMetadata {
   name?: string;

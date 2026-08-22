@@ -7,8 +7,7 @@ import { LogsService } from '@shared/services/logs.service';
 import { UpdateService } from '@shared/services/update.service';
 import {
   KNOWN_ART_TYPES,
-  SOURCE_SUPPORTED_TYPES,
-  ArtSourceId,
+  SUPPORTED_ART_TYPES,
   artTypeLabel,
 } from '@shared/constants/artwork-presets';
 
@@ -21,7 +20,6 @@ import {
 export class SettingsComponent implements OnInit {
   public settings$: Observable<AppSettings>;
   public verboseMode = false;
-  public refreshingIndex = false;
 
   readonly knownArtTypes = KNOWN_ART_TYPES;
   readonly artTypeLabel = artTypeLabel;
@@ -60,29 +58,12 @@ export class SettingsComponent implements OnInit {
     this._settings.set('namingConvention', value);
   }
 
-  onArtSourceChange(value: ArtSourceId): void {
-    this._settings.set('artSource', value);
-  }
-
-  async refreshArtIndex(): Promise<void> {
-    this.refreshingIndex = true;
-    try {
-      await Promise.all([
-        window.libraryAPI.refreshLibretroIndex('PS1'),
-        window.libraryAPI.refreshLibretroIndex('PS2'),
-      ]);
-    } finally {
-      this.refreshingIndex = false;
-    }
-  }
-
   isArtTypeSelected(type: string): boolean {
     return this._settings.current.defaultArtTypes.includes(type);
   }
 
   isArtTypeSupported(type: string): boolean {
-    const source = this._settings.current.artSource ?? 'github';
-    return SOURCE_SUPPORTED_TYPES[source].includes(type);
+    return SUPPORTED_ART_TYPES.includes(type);
   }
 
   toggleDefaultArtType(type: string): void {

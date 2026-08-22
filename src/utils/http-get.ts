@@ -48,6 +48,41 @@ export function httpGetBuffer(
   });
 }
 
+/** POST a text body to a URL and buffer the full response body as text. */
+export function httpPostText(
+  url: string,
+  body: string,
+  headers?: Record<string, string>
+): Promise<HttpTextResult> {
+  return new Promise((resolve, reject) => {
+    const payload = Buffer.from(body, "utf-8");
+    const req = https.request(
+      url,
+      {
+        method: "POST",
+        headers: {
+          ...DEFAULT_HEADERS,
+          ...headers,
+          "Content-Length": payload.length,
+        },
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk) => chunks.push(chunk));
+        res.on("end", () =>
+          resolve({
+            status: res.statusCode ?? 0,
+            text: Buffer.concat(chunks).toString("utf-8"),
+          })
+        );
+      }
+    );
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
+}
+
 export async function httpGetJson<T>(
   url: string,
   headers?: Record<string, string>

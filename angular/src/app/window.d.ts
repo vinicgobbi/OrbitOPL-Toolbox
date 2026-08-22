@@ -89,14 +89,13 @@ declare interface Window {
     /** Remove all PS1 delete progress listeners. */
     removeAllDeletePs1ProgressListeners: () => void;
 
-    /** Download cover/background art for a game by its ID. */
+    /** Download cover/background art for a game by its ID (via the OPL Manager art database). */
     downloadArtByGameId: (
       dirPath: string,
       gameId: string,
       system?: 'PS1' | 'PS2',
       saveAsName?: string,
       artTypes?: string[],
-      opts?: ArtSourceOpts,
     ) => Promise<any>;
 
     /** Check which of the given filenames exist in the art directory. */
@@ -105,27 +104,15 @@ declare interface Window {
       filenames: string[],
     ) => Promise<string[]>;
 
-    /** List the artwork actually available for a game in the art database. */
+    /** List the artwork actually available for a game in the OPL Manager art database. */
     listAvailableArt: (
       gameId: string,
       system?: 'PS1' | 'PS2',
-      opts?: ArtSourceOpts,
     ) => Promise<{
       success: boolean;
       data: { type: string; fileName: string; downloadUrl: string }[];
       message?: string;
     }>;
-
-    /** Case-insensitive substring search across libretro-thumbnails filenames, for manual matching. */
-    searchLibretroArt: (
-      system: 'PS1' | 'PS2',
-      query: string,
-    ) => Promise<{ type: string; fileName: string }[]>;
-
-    /** Force a refresh of the cached libretro-thumbnails filename index. */
-    refreshLibretroIndex: (
-      system: 'PS1' | 'PS2',
-    ) => Promise<{ success: boolean }>;
 
     /** Fetch descriptive game metadata (developer, genre, description, ...) from libretro-database. */
     fetchLibretroMetadata: (
@@ -472,16 +459,6 @@ declare interface AppSettings {
   namingConvention: "old" | "new";
   /** Art types downloaded by default in bulk artwork operations. */
   defaultArtTypes: string[];
-  /** Which artwork source to pull from. 'github' is the curated OPL-specific database (default). */
-  artSource: "github" | "libretro";
-}
-
-/** Extra context a name-based art source (libretro-thumbnails) uses to resolve the right file. */
-declare interface ArtSourceOpts {
-  source?: "github" | "libretro";
-  title?: string;
-  region?: "NTSC-U" | "PAL" | "NTSC-J" | "UNKNOWN";
-  manualFileNames?: Record<string, string>;
 }
 
 /** Descriptive game metadata resolved from libretro-database (PS2 has no `esrbRating` source). */

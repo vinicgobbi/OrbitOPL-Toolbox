@@ -9,8 +9,8 @@ import {
   lookupMetadata,
   applyMetadataToGameCfg,
   GameMetadata,
+  LibretroSystem,
 } from "../libretro/libretro-metadata.service";
-import { LibretroSystem } from "../libretro/libretro-index.service";
 
 export function registerCfgIpc(): void {
   ipcMain.handle(

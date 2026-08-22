@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable, map } from 'rxjs';
 import { LogsService } from './logs.service';
 import { LibraryService } from './library.service';
 import { ConfirmDialogService } from './confirm-dialog.service';
-import { SettingsService } from './settings.service';
 
 export type ImportJobType =
   | 'ps2-dvd'
@@ -58,15 +57,10 @@ export interface ImportJob {
    * matching logic in updateArtForGame.
    */
   saveAsName?: string;
-  /** Artwork only: game region, used by name-based sources (libretro) to rank matches. */
-  region?: 'NTSC-U' | 'PAL' | 'NTSC-J' | 'UNKNOWN';
-  /** Artwork only: exact filenames picked from a manual libretro search, keyed by type code. */
-  manualFileNames?: Record<string, string>;
   /**
    * Artwork only: also fetch descriptive metadata (developer, genre,
    * description, release date, players, rating) from libretro-database and
-   * merge it into the game's OPL CFG / title.cfg. Only applies when the
-   * active art source is 'libretro'.
+   * merge it into the game's OPL CFG / title.cfg.
    */
   fetchMetadata?: boolean;
   /** Artwork only (PS1 launchers): folder holding the launcher's title.cfg, for metadata writes. */
@@ -131,7 +125,6 @@ export class JobsService {
     private readonly _logger: LogsService,
     private readonly _library: LibraryService,
     private readonly _confirm: ConfirmDialogService,
-    private readonly _settings: SettingsService,
   ) {}
 
   /** Queue one or more imports (as a single batch) and kick the worker if idle. */
@@ -390,19 +383,12 @@ export class JobsService {
 
     this.patchJob(job.id, { stage: 'Downloading artwork…', percent: 50 });
 
-    const artSource = this._settings.current.artSource ?? 'github';
     const result = await window.libraryAPI.downloadArtByGameId(
       artDir,
       job.gameId,
       job.system ?? 'PS2',
       saveAsName,
       downloadTypes,
-      {
-        source: artSource,
-        title: job.gameName,
-        region: job.region,
-        manualFileNames: job.manualFileNames,
-      },
     );
 
     if (result?.data) {
@@ -434,7 +420,7 @@ export class JobsService {
     }
 
     let metadataMessage: string | undefined;
-    if (job.fetchMetadata && artSource === 'libretro') {
+    if (job.fetchMetadata) {
       metadataMessage = await this.fetchAndApplyMetadata(job, dirPath);
     }
 
@@ -618,13 +604,6 @@ export class JobsService {
           `${dirPath}/ART`,
           job.gameId,
           'PS2',
-          undefined,
-          undefined,
-          {
-            source: this._settings.current.artSource ?? 'github',
-            title: job.gameName,
-            region: job.region,
-          },
         );
       }
 

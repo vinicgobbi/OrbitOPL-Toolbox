@@ -1,8 +1,6 @@
 import { ipcMain } from "electron";
 import { checkArtFilesExist } from "./artwork.service";
-import { downloadArt, listArt } from "./artwork-router.service";
-import { ArtSourceOptions } from "./art-sources/types";
-import { searchFuzzy, ensureThumbIndex, LibretroSystem } from "../libretro/libretro-index.service";
+import { downloadArtByGameId, listAvailableArt } from "./oplmanager-artwork.service";
 
 export function registerArtworkIpc(): void {
   ipcMain.handle(
@@ -13,10 +11,9 @@ export function registerArtworkIpc(): void {
       gameId: string,
       system?: "PS1" | "PS2",
       saveAsName?: string,
-      artTypes?: string[],
-      opts?: ArtSourceOptions
+      artTypes?: string[]
     ) => {
-      return downloadArt(dirPath, gameId, system || "PS2", saveAsName, artTypes, opts);
+      return downloadArtByGameId(dirPath, gameId, system || "PS2", saveAsName, artTypes);
     }
   );
 
@@ -26,23 +23,8 @@ export function registerArtworkIpc(): void {
 
   ipcMain.handle(
     "list-available-art",
-    async (_event, gameId: string, system?: "PS1" | "PS2", opts?: ArtSourceOptions) => {
-      return listArt(gameId, system || "PS2", opts);
-    }
-  );
-
-  ipcMain.handle(
-    "search-libretro-art",
-    async (_event, system: LibretroSystem, query: string) => {
-      return searchFuzzy(system, query);
-    }
-  );
-
-  ipcMain.handle(
-    "refresh-libretro-index",
-    async (_event, system: LibretroSystem) => {
-      await ensureThumbIndex(system, true);
-      return { success: true };
+    async (_event, gameId: string, system?: "PS1" | "PS2") => {
+      return listAvailableArt(gameId, system || "PS2");
     }
   );
 }

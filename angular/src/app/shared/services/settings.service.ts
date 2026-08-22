@@ -15,7 +15,6 @@ export class SettingsService {
     autoReconnect: true,
     namingConvention: 'new',
     defaultArtTypes: ['COV', 'ICO', 'SCR'],
-    artSource: 'github',
   });
   public get settings$(): Observable<AppSettings> {
     return this.settingsSubject.asObservable();

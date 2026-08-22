@@ -86,7 +86,6 @@ export class LibraryComponent {
         saveAsName: g.isPs1Launcher ? g.ps1LauncherBoot : undefined,
         skipExisting,
         artTypes,
-        region: g.region,
         fetchMetadata,
         launcherPath: g.isPs1Launcher ? g.ps1LauncherPath : undefined,
       }))

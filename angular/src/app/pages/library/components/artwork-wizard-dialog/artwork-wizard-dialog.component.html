@@ -24,52 +24,6 @@
       <i-lucide name="image-off" size="28" class="text-base-content/40"></i-lucide>
       <p class="text-sm text-base-content/60">{{ errorMessage() }}</p>
     </div>
-    @if (isLibretroSource()) {
-      <div class="flex flex-col gap-3 border-t border-base-content/10 px-5 py-4">
-        <p class="text-xs text-base-content/60">
-          Search libretro-thumbnails manually — matching wasn't exact for this game's title.
-        </p>
-        <div class="flex gap-2">
-          <input
-            type="text"
-            class="input input-sm input-bordered flex-1"
-            placeholder="Game title…"
-            [value]="manualQuery()"
-            (input)="manualQuery.set($any($event.target).value)"
-            (keyup.enter)="runManualSearch()"
-          />
-          <button
-            class="btn btn-sm btn-primary"
-            [disabled]="manualSearching() || !manualQuery().trim()"
-            (click)="runManualSearch()"
-          >
-            @if (manualSearching()) {
-              <span class="loading loading-spinner loading-xs"></span>
-            } @else {
-              <i-lucide name="search" size="14"></i-lucide>
-            }
-            Search
-          </button>
-        </div>
-        @if (manualResults().length > 0) {
-          <div class="flex max-h-48 flex-col gap-1 overflow-y-auto">
-            @for (match of manualResults(); track match.type + match.fileName) {
-              <button
-                class="flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-base-100/40"
-                (click)="pickManualResult(match)"
-              >
-                <span class="font-mono text-[0.6rem] text-base-content/40 shrink-0">{{ match.type }}</span>
-                <span class="truncate">{{ match.fileName }}</span>
-              </button>
-            }
-          </div>
-        } @else if (!manualSearching() && manualQuery().trim() === '') {
-          <p class="text-[0.68rem] text-base-content/40 italic">
-            Try the exact release title, e.g. "Final Fantasy X".
-          </p>
-        }
-      </div>
-    }
     <div class="flex justify-end gap-2 border-t border-base-content/10 px-5 py-3">
       <button class="btn btn-ghost btn-sm" (click)="close()">Close</button>
     </div>
@@ -87,52 +41,6 @@
           <button class="btn btn-xs btn-ghost" (click)="deselectAll()">None</button>
         </div>
       </fieldset>
-
-      @if (isLibretroSource()) {
-        <button class="btn btn-xs btn-ghost self-start" (click)="showManualSearch.set(!showManualSearch())">
-          <i-lucide name="search" size="12"></i-lucide>
-          Not the right game? Search manually
-        </button>
-      }
-      @if (showManualSearch()) {
-        <div class="flex flex-col gap-3 rounded-md bg-base-100/40 p-3">
-          <div class="flex gap-2">
-            <input
-              type="text"
-              class="input input-sm input-bordered flex-1"
-              placeholder="Game title…"
-              [value]="manualQuery()"
-              (input)="manualQuery.set($any($event.target).value)"
-              (keyup.enter)="runManualSearch()"
-            />
-            <button
-              class="btn btn-sm btn-primary"
-              [disabled]="manualSearching() || !manualQuery().trim()"
-              (click)="runManualSearch()"
-            >
-              @if (manualSearching()) {
-                <span class="loading loading-spinner loading-xs"></span>
-              } @else {
-                <i-lucide name="search" size="14"></i-lucide>
-              }
-              Search
-            </button>
-          </div>
-          @if (manualResults().length > 0) {
-            <div class="flex max-h-48 flex-col gap-1 overflow-y-auto">
-              @for (match of manualResults(); track match.type + match.fileName) {
-                <button
-                  class="flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-base-100/60"
-                  (click)="pickManualResult(match)"
-                >
-                  <span class="font-mono text-[0.6rem] text-base-content/40 shrink-0">{{ match.type }}</span>
-                  <span class="truncate">{{ match.fileName }}</span>
-                </button>
-              }
-            </div>
-          }
-        </div>
-      }
 
       <div class="aw-grid">
         @for (option of options(); track option.type) {
@@ -170,17 +78,15 @@
           />
           <span class="text-xs text-base-content/70">Skip existing artwork</span>
         </label>
-        @if (isLibretroSource()) {
-          <label class="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-primary"
-              [checked]="fetchMetadata()"
-              (change)="fetchMetadata.set(!fetchMetadata())"
-            />
-            <span class="text-xs text-base-content/70">Also fetch game info (genre, developer, description…)</span>
-          </label>
-        }
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-primary"
+            [checked]="fetchMetadata()"
+            (change)="fetchMetadata.set(!fetchMetadata())"
+          />
+          <span class="text-xs text-base-content/70">Also fetch game info (genre, developer, description…)</span>
+        </label>
       </div>
       <div class="flex items-center gap-3">
         <span class="text-xs text-base-content/50">{{ selectedCount() }} selected</span>

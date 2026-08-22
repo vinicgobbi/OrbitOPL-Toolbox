@@ -3,8 +3,7 @@ import path from "path";
 import { mergeMultiBin } from "../../utils/binmerge";
 import { parseCueSheet, getCueDirectory } from "../../utils/cue-parser";
 import { tryDetermineGameIdFromHex } from "./game-id-resolver.service";
-import { downloadArt } from "../artwork/artwork-router.service";
-import { mapGameIdToRegion } from "../../utils/region";
+import { downloadArtByGameId } from "../artwork/oplmanager-artwork.service";
 import { sanitizeGameFilename } from "../../utils/sanitize";
 import { createLogger, formatBytes } from "../../logger";
 
@@ -224,10 +223,7 @@ export async function importPs2CdGame(
     if (downloadArtwork) {
       if (onProgress) onProgress(95, "Downloading artwork");
       try {
-        await downloadArt(artDir, gameId, "PS2", undefined, undefined, {
-          title: gameName,
-          region: mapGameIdToRegion(gameId),
-        });
+        await downloadArtByGameId(artDir, gameId, "PS2");
       } catch {
         // non-critical
       }
